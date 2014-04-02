@@ -31,7 +31,7 @@ public class ContentGetController extends AbstractController {
         
         NodeContent nodeContent = contentFacade.getContentByPath(contentPath);
         
-        if(CONTENT_REQUEST_TYPE.equals(requestType)) {
+        if(requestType == null || CONTENT_REQUEST_TYPE.equals(requestType)) {
             InputStream in = nodeContent.getInputStream();
             OutputStream out = response.getOutputStream();
             
