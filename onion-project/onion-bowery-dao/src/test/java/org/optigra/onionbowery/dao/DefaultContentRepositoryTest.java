@@ -1,12 +1,15 @@
 package org.optigra.onionbowery.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jcr.Binary;
 import javax.jcr.Node;
@@ -18,12 +21,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.optigra.onionbowery.dao.JcrRepositoryImpl;
 import org.optigra.onionbowery.dao.jcr.JcrSessionFactory;
+import org.optigra.onionbowery.dao.mapper.ContentMapper;
 import org.optigra.onionbowery.model.Content;
+import org.optigra.onionbowery.model.NodeContent;
 
 @RunWith(MockitoJUnitRunner.class)
-public class JcrRepositoryImplTest {
+public class DefaultContentRepositoryTest {
 
     @Mock
     private Session session;
@@ -39,56 +43,37 @@ public class JcrRepositoryImplTest {
     
     @Mock
     private Binary binary;
+    
+    @Mock
+    private ContentMapper<NodeContent> contentMapper;
 
     @InjectMocks
-    private JcrRepositoryImpl unit = new JcrRepositoryImpl();
-    
-    @Test
-    public void testGetContentByUuid() throws Exception {
-        // Given
-        String contentId = "contentId";
-        InputStream expectedStream = new ByteArrayInputStream("somstring".getBytes("UTF-8"));
-
-        // When
-        when(sessionFactory.getCurrentSession()).thenReturn(session);
-        when(session.getNodeByIdentifier(anyString())).thenReturn(node);
-        when(node.getProperty(anyString())).thenReturn(property);
-        when(property.getBinary()).thenReturn(binary);
-        when(binary.getStream()).thenReturn(expectedStream);
-
-        InputStream actualStream = unit.getContentByUuid(contentId);
-
-        // Then
-        verify(sessionFactory).getCurrentSession();
-        verify(session).getNodeByIdentifier(contentId);
-        verify(property).getBinary();
-        verify(binary).getStream();
-        
-        assertEquals(expectedStream, actualStream);
-    }
+    private DefaultContentRepository unit = new DefaultContentRepository();
 
     @Test
     public void testGetContentByPath() throws Exception {
         // Given
         String contentId = "contentId";
-        InputStream expectedStream = new ByteArrayInputStream("somstring".getBytes("UTF-8"));
+        String name = "name";
+        InputStream stream = new ByteArrayInputStream("somstring".getBytes("UTF-8"));
+        NodeContent expectedNodeContent = new NodeContent();
+        expectedNodeContent.setInputStream(stream);
+        expectedNodeContent.setName(name);
+        
         
         // When
         when(sessionFactory.getCurrentSession()).thenReturn(session);
         when(session.getNode(anyString())).thenReturn(node);
-        when(node.getProperty(anyString())).thenReturn(property);
-        when(property.getBinary()).thenReturn(binary);
-        when(binary.getStream()).thenReturn(expectedStream);
+        when(contentMapper.map(any(Node.class))).thenReturn(expectedNodeContent);
         
-        InputStream actualStream = unit.getContentByPath(contentId);
+        NodeContent actualNodeContent = unit.getContentByPath(contentId);
         
         // Then
         verify(sessionFactory).getCurrentSession();
         verify(session).getNode(contentId);
-        verify(property).getBinary();
-        verify(binary).getStream();
+        verify(contentMapper).map(node);
         
-        assertEquals(expectedStream, actualStream);
+        assertEquals(expectedNodeContent, actualNodeContent);
     }
     
     @Test
@@ -98,10 +83,12 @@ public class JcrRepositoryImplTest {
         String path = "/path/to/me";
         String fileName = "filename";
         
+        Map<String, String> attributes = new HashMap<String, String>();
         Content content = new Content();
         content.setFileName(fileName);
         content.setStream(stream);
         content.setPath(path);
+        content.setAttributes(attributes);
         
         // When
         String expectedContentId = "contentId";
@@ -118,7 +105,7 @@ public class JcrRepositoryImplTest {
         when(node.getNode("me")).thenReturn(node);
         
         when(sessionFactory.getCurrentSession()).thenReturn(session);
-        when(node.addNode(anyString())).thenReturn(node);
+        when(node.addNode(anyString(), anyString())).thenReturn(node);
         when(node.getIdentifier()).thenReturn(expectedContentId);
         
         String actualContentId = unit.storeContent(content);
@@ -139,10 +126,12 @@ public class JcrRepositoryImplTest {
         String path = "/path/to/me";
         String fileName = "filename";
         
+        Map<String, String> attributes = new HashMap<>();
         Content content = new Content();
         content.setFileName(fileName);
         content.setStream(stream);
         content.setPath(path);
+        content.setAttributes(attributes);
         
         // When
         String expectedContentId = "contentId";
@@ -159,7 +148,7 @@ public class JcrRepositoryImplTest {
         when(node.addNode("me")).thenReturn(node);
         
         when(sessionFactory.getCurrentSession()).thenReturn(session);
-        when(node.addNode(anyString())).thenReturn(node);
+        when(node.addNode(anyString(), anyString())).thenReturn(node);
         when(node.getIdentifier()).thenReturn(expectedContentId);
         
         String actualContentId = unit.storeContent(content);
@@ -180,10 +169,12 @@ public class JcrRepositoryImplTest {
         String path = "/path/to/me";
         String fileName = "filename 2013 - 01.jpg";
         
+        Map<String, String> attributes = new HashMap<>();
         Content content = new Content();
         content.setFileName(fileName);
         content.setStream(stream);
         content.setPath(path);
+        content.setAttributes(attributes);
         
         // When
         String expectedContentId = "contentId";
@@ -200,7 +191,7 @@ public class JcrRepositoryImplTest {
         when(node.addNode("me")).thenReturn(node);
         
         when(sessionFactory.getCurrentSession()).thenReturn(session);
-        when(node.addNode(anyString())).thenReturn(node);
+        when(node.addNode(anyString(), anyString())).thenReturn(node);
         when(node.getIdentifier()).thenReturn(expectedContentId);
         
         String actualContentId = unit.storeContent(content);

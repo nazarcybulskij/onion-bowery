@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.optigra.onionbowery.dao.ContentRepository;
 import org.optigra.onionbowery.model.Content;
-import org.optigra.onionbowery.service.content.DefaultContentService;
+import org.optigra.onionbowery.model.NodeContent;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultContentServiceTest {
@@ -26,35 +26,22 @@ public class DefaultContentServiceTest {
     
     @InjectMocks
     private DefaultContentService unit = new DefaultContentService();
-    
-    @Test
-    public void testGetContentByUuid() throws Exception {
-        // Given
-        String id = "uuid";
-        InputStream expectedStream = new ByteArrayInputStream("somstring".getBytes("UTF-8"));
-
-        // When
-        when(contentRepository.getContentByUuid(anyString())).thenReturn(expectedStream);
-        InputStream actualStream = unit.getContentByUuid(id);
-
-        // Then
-        verify(contentRepository).getContentByUuid(id);
-        assertEquals(expectedStream, actualStream);
-    }
 
     @Test
     public void testGetContentByPath() throws Exception {
         // Given
         String path = "/path/to/file.ext";
-        InputStream expectedStream = new ByteArrayInputStream("somstring".getBytes("UTF-8"));
+        String name = "name";
+        NodeContent expectedContent = new NodeContent();
+        expectedContent.setName(name);
         
         // When
-        when(contentRepository.getContentByPath(anyString())).thenReturn(expectedStream);
-        InputStream actualStream = unit.getContentByPath(path);
+        when(contentRepository.getContentByPath(anyString())).thenReturn(expectedContent);
+        NodeContent actualContent = unit.getContentByPath(path);
         
         // Then
         verify(contentRepository).getContentByPath(path);
-        assertEquals(expectedStream, actualStream);
+        assertEquals(expectedContent, actualContent);
     }
     
     @Test

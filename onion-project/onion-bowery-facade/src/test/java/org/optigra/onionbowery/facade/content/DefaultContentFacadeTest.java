@@ -18,9 +18,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.optigra.onionbowery.facade.content.DefaultContentFacade;
 import org.optigra.onionbowery.facade.converter.Converter;
 import org.optigra.onionbowery.model.Content;
+import org.optigra.onionbowery.model.NodeContent;
 import org.optigra.onionbowery.resource.ContentResource;
 import org.optigra.onionbowery.service.content.ContentService;
 
@@ -44,17 +44,18 @@ public class DefaultContentFacadeTest {
     public void testGetContentByPath() throws Exception {
         // Given
         String contentPath = "/contentPath";
-        String content = "very large content";
-        InputStream expectedStream = new ByteArrayInputStream(content.getBytes());
+        String name = "name";
+        NodeContent expectedNodeContent = new NodeContent();
+        expectedNodeContent.setName(name);
         
         // When
-        when(contentService.getContentByPath(anyString())).thenReturn(expectedStream);
+        when(contentService.getContentByPath(anyString())).thenReturn(expectedNodeContent);
         
-        InputStream actualStream = unit.getContentByPath(contentPath);
+        NodeContent actualNodeContent = unit.getContentByPath(contentPath);
 
         // Then
         verify(contentService).getContentByPath(contentPath);
-        assertEquals(expectedStream, actualStream);
+        assertEquals(expectedNodeContent, actualNodeContent);
     }
 
     @Test

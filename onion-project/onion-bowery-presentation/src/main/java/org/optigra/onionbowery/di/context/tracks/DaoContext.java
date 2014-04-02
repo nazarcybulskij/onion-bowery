@@ -13,9 +13,10 @@ import org.apache.jackrabbit.core.RepositoryImpl;
 import org.apache.jackrabbit.core.config.ConfigurationException;
 import org.apache.jackrabbit.core.config.RepositoryConfig;
 import org.optigra.onionbowery.dao.ContentRepository;
-import org.optigra.onionbowery.dao.JcrRepositoryImpl;
+import org.optigra.onionbowery.dao.DefaultContentRepository;
 import org.optigra.onionbowery.dao.jcr.JcrSessionFactory;
 import org.optigra.onionbowery.dao.jcr.JcrSessionFactoryImpl;
+import org.optigra.onionbowery.dao.mapper.DefaultContentMapper;
 import org.optigra.onionbowery.di.bean.Bean;
 import org.optigra.onionbowery.di.bean.Scope;
 import org.optigra.onionbowery.di.context.AbstractAppContext;
@@ -34,7 +35,20 @@ public class DaoContext extends AbstractAppContext {
         
         put("jcrSession", jcrSession());
         put("jcrSessionFactory", jcrSessionFactory());
+        put("contentMapper", contentMapper());
         put("contentRepository", contentRepository());
+    }
+
+    private Bean<DefaultContentMapper> contentMapper() {
+        
+        DefaultContentMapper contentMapper = new DefaultContentMapper();
+        
+        Bean<DefaultContentMapper> contentMapperBean = new Bean<>();
+        contentMapperBean.setClz(DefaultContentMapper.class);
+        contentMapperBean.setInstance(contentMapper);
+        contentMapperBean.setScope(Scope.SINGLETON);
+        
+        return contentMapperBean;
     }
 
     private Bean<RepositoryConfig> jcrRepositoryConfig() throws ConfigurationException {
@@ -94,8 +108,9 @@ public class DaoContext extends AbstractAppContext {
 
     private Bean<ContentRepository> contentRepository() {
         
-        JcrRepositoryImpl contentRepository = new JcrRepositoryImpl();
+        DefaultContentRepository contentRepository = new DefaultContentRepository();
         contentRepository.setSessionFactory(getBean("jcrSessionFactory", JcrSessionFactory.class));
+        contentRepository.setContentMapper(getBean("contentMapper", DefaultContentMapper.class));
         
         Bean<ContentRepository> contentRepositoryBean = new Bean<>();
         contentRepositoryBean.setClz(ContentRepository.class);

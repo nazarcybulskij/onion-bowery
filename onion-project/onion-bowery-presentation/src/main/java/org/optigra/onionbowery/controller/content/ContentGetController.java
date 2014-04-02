@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.optigra.onionbowery.common.exception.ContentNotFoundException;
 import org.optigra.onionbowery.controller.AbstractController;
 import org.optigra.onionbowery.facade.content.ContentFacade;
+import org.optigra.onionbowery.model.NodeContent;
 import org.optigra.onionbowery.servlet.request.RequestWrapper;
 import org.optigra.onionbowery.servlet.response.ResponseWrapper;
 
@@ -18,17 +19,26 @@ import org.optigra.onionbowery.servlet.response.ResponseWrapper;
  */
 public class ContentGetController extends AbstractController {
 
+    private static final String CONTENT_REQUEST_TYPE = "content";
+    
     private ContentFacade contentFacade;
     
     @Override
-    public void handle(final RequestWrapper req, final ResponseWrapper resp) throws ContentNotFoundException, IOException {
+    public void handle(final RequestWrapper request, final ResponseWrapper response) throws ContentNotFoundException, IOException {
         
-        String contentPath = req.getParameter("contentPath");
+        String contentPath = request.getParameter("contentPath");
+        String requestType = request.getParameter("requestType");
         
-        InputStream in = contentFacade.getContentByPath(contentPath);
-        OutputStream out = resp.getOutputStream();
+        NodeContent nodeContent = contentFacade.getContentByPath(contentPath);
         
-        IOUtils.copy(in, out);
+        if(CONTENT_REQUEST_TYPE.equals(requestType)) {
+            InputStream in = nodeContent.getInputStream();
+            OutputStream out = response.getOutputStream();
+            
+            IOUtils.copy(in, out);
+        }
+        
+        response.setResponseObject(nodeContent);
     }
 
     public void setContentFacade(final ContentFacade contentFacade) {
