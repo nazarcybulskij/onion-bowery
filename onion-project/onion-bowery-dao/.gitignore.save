@@ -1,0 +1,30 @@
+  GNU nano 2.2.6                                     File: .gitignore                                                                        Modified  
+
+.settings/
+.classpath
+.project
+.gradle/
+build
+bin
+*target*
+*.jar
+*.war
+*.class
+
+# eclipse specific git ignore
+.project
+.metadata
+bin/**
+local.properties
+.classpath
+.settings/
+.loadpath
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+
+

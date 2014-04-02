@@ -5,9 +5,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.onion.bowery.facade.content.ContentFacade;
 import org.optigra.onionbowery.common.exception.ContentNotFoundException;
 import org.optigra.onionbowery.controller.AbstractController;
+import org.optigra.onionbowery.facade.content.ContentFacade;
 import org.optigra.onionbowery.servlet.request.RequestWrapper;
 import org.optigra.onionbowery.servlet.response.ResponseWrapper;
 

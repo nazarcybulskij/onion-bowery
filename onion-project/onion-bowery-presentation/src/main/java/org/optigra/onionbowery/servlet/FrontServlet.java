@@ -12,6 +12,8 @@ import org.optigra.onionbowery.di.context.DefaultAppContext;
 import org.optigra.onionbowery.servlet.request.RequestWrapper;
 import org.optigra.onionbowery.servlet.request.dispatcher.RequestHandler;
 import org.optigra.onionbowery.servlet.response.ResponseWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -23,6 +25,8 @@ import org.optigra.onionbowery.servlet.response.ResponseWrapper;
  */
 public class FrontServlet extends HttpServlet {
     private static final long serialVersionUID = 2460827716415241950L;
+    
+    private static final Logger logger = LoggerFactory.getLogger(FrontServlet.class);
 
     private AppContext appContext;
 
@@ -34,7 +38,7 @@ public class FrontServlet extends HttpServlet {
             appContext = new DefaultAppContext(getServletContext());
             requestHandler = appContext.getBean("requestHandler", RequestHandler.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

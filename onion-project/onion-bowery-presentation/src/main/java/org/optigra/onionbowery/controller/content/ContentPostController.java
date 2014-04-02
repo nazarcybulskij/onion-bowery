@@ -7,9 +7,9 @@ import java.util.Map;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.onion.bowery.facade.content.ContentFacade;
-import org.onion.bowery.resource.ContentResource;
 import org.optigra.onionbowery.controller.AbstractController;
+import org.optigra.onionbowery.facade.content.ContentFacade;
+import org.optigra.onionbowery.resource.ContentResource;
 import org.optigra.onionbowery.servlet.request.RequestWrapper;
 import org.optigra.onionbowery.servlet.response.ResponseWrapper;
 
@@ -31,14 +31,30 @@ public class ContentPostController extends AbstractController {
             throw new IllegalArgumentException("Request must have multipart data!");
         }
         
-        Map<String, FileItem> parameters = getParameters(request);
+        Map<String, FileItem> requestParams = getParameters(request);
         
-        String path = parameters.get("path").getString();
-        FileItem fileItem = parameters.get("file");
+        Map<String, String> attributes = getContentAttributes(requestParams);
+        String path = requestParams.get("path").getString();
+        FileItem fileItem = requestParams.get("file");
         
-        ContentResource content = contentFacade.storeContent(fileItem.getInputStream(), fileItem.getName(), path);
+        ContentResource content = contentFacade.storeContent(fileItem.getInputStream(), fileItem.getName(), path, attributes);
         
         response.setResponseObject(content);
+    }
+
+    private Map<String, String> getContentAttributes(final Map<String, FileItem> parameters) {
+        
+        Map<String, String> attributes = new HashMap<>();
+        
+        for(String name: parameters.keySet()) {
+            
+            FileItem fileItem = parameters.get(name);
+            if(fileItem.isFormField()) {
+                attributes.put(name, fileItem.getString());
+            }
+        }
+        
+        return attributes;
     }
 
     private Map<String, FileItem> getParameters(final RequestWrapper request) throws FileUploadException {

@@ -1,11 +1,11 @@
 package org.optigra.onionbowery.di.context.tracks;
 
-import org.onion.bowery.dao.ContentRepository;
-import org.onion.bowery.service.content.ContentService;
-import org.onion.bowery.service.content.DefaultContentService;
+import org.optigra.onionbowery.dao.ContentRepository;
 import org.optigra.onionbowery.di.bean.Bean;
 import org.optigra.onionbowery.di.bean.Scope;
 import org.optigra.onionbowery.di.context.AbstractAppContext;
+import org.optigra.onionbowery.service.content.ContentService;
+import org.optigra.onionbowery.service.content.DefaultContentService;
 
 /**
  * @date Mar 28, 2014

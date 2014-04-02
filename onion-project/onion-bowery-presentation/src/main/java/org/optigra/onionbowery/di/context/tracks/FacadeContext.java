@@ -1,13 +1,13 @@
 package org.optigra.onionbowery.di.context.tracks;
 
-import org.onion.bowery.facade.content.ContentFacade;
-import org.onion.bowery.facade.content.DefaultContentFacade;
-import org.onion.bowery.facade.converter.ContentConverterImpl;
-import org.onion.bowery.facade.converter.Converter;
-import org.onion.bowery.service.content.ContentService;
 import org.optigra.onionbowery.di.bean.Bean;
 import org.optigra.onionbowery.di.bean.Scope;
 import org.optigra.onionbowery.di.context.AbstractAppContext;
+import org.optigra.onionbowery.facade.content.ContentFacade;
+import org.optigra.onionbowery.facade.content.DefaultContentFacade;
+import org.optigra.onionbowery.facade.converter.ContentConverterImpl;
+import org.optigra.onionbowery.facade.converter.Converter;
+import org.optigra.onionbowery.service.content.ContentService;
 
 /**
  * @date Mar 28, 2014

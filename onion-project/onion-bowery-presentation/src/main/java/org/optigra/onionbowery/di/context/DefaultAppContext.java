@@ -11,7 +11,6 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.onion.bowery.facade.content.ContentFacade;
 import org.optigra.onionbowery.controller.Controller;
 import org.optigra.onionbowery.controller.content.ContentGetController;
 import org.optigra.onionbowery.controller.content.ContentPostController;
@@ -20,6 +19,7 @@ import org.optigra.onionbowery.di.bean.Scope;
 import org.optigra.onionbowery.di.context.tracks.DaoContext;
 import org.optigra.onionbowery.di.context.tracks.FacadeContext;
 import org.optigra.onionbowery.di.context.tracks.ServiceContext;
+import org.optigra.onionbowery.facade.content.ContentFacade;
 import org.optigra.onionbowery.servlet.data.DataConverter;
 import org.optigra.onionbowery.servlet.data.DefaultDataConverter;
 import org.optigra.onionbowery.servlet.request.dispatcher.DefaultRequestHandler;
