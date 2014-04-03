@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.optigra.onionbowery.facade.converter.Converter;
 import org.optigra.onionbowery.model.Content;
-import org.optigra.onionbowery.model.NodeContent;
 import org.optigra.onionbowery.resource.ContentResource;
 import org.optigra.onionbowery.service.content.ContentService;
 
@@ -29,6 +28,9 @@ public class DefaultContentFacadeTest {
 
     @Captor
     private ArgumentCaptor<Content> contentCaptor;
+    
+    @Captor
+    private ArgumentCaptor<String> stringCaptor;
     
     @Mock
     private ContentService contentService;
@@ -45,16 +47,23 @@ public class DefaultContentFacadeTest {
         // Given
         String contentPath = "/contentPath";
         String name = "name";
-        NodeContent expectedNodeContent = new NodeContent();
-        expectedNodeContent.setName(name);
+        
+        Content content = new Content();
+        content.setFileName(name);
+        content.setPath(contentPath);
+        
+        ContentResource expectedNodeContent = new ContentResource();
+        expectedNodeContent.setFileName(name);
         
         // When
-        when(contentService.getContentByPath(anyString())).thenReturn(expectedNodeContent);
+        when(contentService.getContentByPath(anyString())).thenReturn(content);
+        when(contentConverter.convert(any(Content.class))).thenReturn(expectedNodeContent);
         
-        NodeContent actualNodeContent = unit.getContentByPath(contentPath);
+        ContentResource actualNodeContent = unit.getContentByPath(contentPath);
 
         // Then
         verify(contentService).getContentByPath(contentPath);
+        verify(contentConverter).convert(content);
         assertEquals(expectedNodeContent, actualNodeContent);
     }
 
@@ -72,9 +81,9 @@ public class DefaultContentFacadeTest {
         
         Content content = new Content();
         content.setPath(path);
-        content.setStream(stream);
+        content.setInputStream(stream);
         content.setFileName(fileName);
-        content.setAttributes(attributes);
+        content.setProperties(attributes);
         
         // When
         when(contentConverter.convert(any(Content.class))).thenReturn(expectedContentResource);
@@ -85,5 +94,18 @@ public class DefaultContentFacadeTest {
         verify(contentService).storeContent(contentCaptor.capture());
         assertEquals(content, contentCaptor.getValue());
         assertEquals(expectedContentResource, actualContentResource);
+    }
+    
+    @Test
+    public void testDeleteContent() throws Exception {
+        // Given
+        String contentPath = "/content/path";
+
+        // When
+        unit.deleteContent(contentPath);
+
+        // Then
+        verify(contentService).deleteContent(stringCaptor.capture());
+        assertEquals(contentPath, stringCaptor.getValue());
     }
 }

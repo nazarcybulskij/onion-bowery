@@ -12,6 +12,7 @@ import javax.servlet.ServletContext;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.optigra.onionbowery.controller.Controller;
+import org.optigra.onionbowery.controller.content.ContentDeleteController;
 import org.optigra.onionbowery.controller.content.ContentGetController;
 import org.optigra.onionbowery.controller.content.ContentPostController;
 import org.optigra.onionbowery.di.bean.Bean;
@@ -69,6 +70,7 @@ public class DefaultAppContext extends AbstractAppContext {
     public void dependencies() {
         put("servletFileUpload", servletFileUpload());
 
+        put("contentDeleteController", contentDeleteController());
         put("contentPostController", contentPostController());
         put("contentGetController", contentGetController());
         
@@ -131,7 +133,6 @@ public class DefaultAppContext extends AbstractAppContext {
         return controllersMapBean;
     }
 
-
     private Bean<Controller> contentGetController() {
 
         ContentGetController contentController = new ContentGetController();
@@ -158,6 +159,19 @@ public class DefaultAppContext extends AbstractAppContext {
         
         return contentControllerBean;
     }
+    
+    private Bean<Controller> contentDeleteController() {
+
+        ContentDeleteController instance = new ContentDeleteController();
+        instance.setContentFacade(getBean("contentFacade", ContentFacade.class));
+        
+        Bean<Controller> deleteControllerBean = new Bean<>();
+        deleteControllerBean.setClz(Controller.class);
+        deleteControllerBean.setInstance(instance);
+        deleteControllerBean.setScope(Scope.SINGLETON);
+        
+        return deleteControllerBean;
+    }
 
     private Bean<ServletFileUpload> servletFileUpload() {
         
@@ -180,6 +194,8 @@ public class DefaultAppContext extends AbstractAppContext {
     private void urlMapping(final Map<String, Controller> controllersMap) {
         controllersMap.put("/contentGET", getBean("contentGetController", Controller.class));
         controllersMap.put("/contentPOST", getBean("contentPostController", Controller.class));
+        controllersMap.put("/contentPUT", getBean("contentPostController", Controller.class));
+        controllersMap.put("/contentDELETE", getBean("contentDeleteController", Controller.class));
     }
 
 }

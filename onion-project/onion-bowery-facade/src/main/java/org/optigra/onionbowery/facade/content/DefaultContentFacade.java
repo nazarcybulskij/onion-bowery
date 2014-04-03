@@ -3,27 +3,26 @@ package org.optigra.onionbowery.facade.content;
 import java.io.InputStream;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.optigra.onionbowery.common.exception.ContentException;
 import org.optigra.onionbowery.common.exception.ContentNotFoundException;
 import org.optigra.onionbowery.facade.converter.Converter;
 import org.optigra.onionbowery.model.Content;
-import org.optigra.onionbowery.model.NodeContent;
 import org.optigra.onionbowery.resource.ContentResource;
 import org.optigra.onionbowery.service.content.ContentService;
 
 public class DefaultContentFacade implements ContentFacade {
 
-    @Resource(name = "contentService")
     private ContentService contentService;
     
-    @Resource(name = "contentConverter")
     private Converter<Content, ContentResource> contentConverter;
 	
 	@Override
-	public NodeContent getContentByPath(final String contentPath) throws ContentNotFoundException {
-	    return contentService.getContentByPath(contentPath);
+	public ContentResource getContentByPath(final String contentPath) throws ContentNotFoundException {
+	    
+	    Content content = contentService.getContentByPath(contentPath);
+	    ContentResource contentResource = contentConverter.convert(content);
+	    
+	    return contentResource;
 	}
 
     @Override
@@ -32,17 +31,22 @@ public class DefaultContentFacade implements ContentFacade {
         // Initialize content object
         Content content = new Content();
         content.setPath(path);
-        content.setStream(stream);
+        content.setInputStream(stream);
         content.setFileName(fileName);
-        content.setAttributes(attributes);
+        content.setProperties(attributes);
         
         // Delegate work to service layer
-        contentService.storeContent(content);
+        Content resultContent = contentService.storeContent(content);
         
         // Object convertation due to some unnessesary field in Content model
-        ContentResource contentResource = contentConverter.convert(content);
+        ContentResource contentResource = contentConverter.convert(resultContent);
         
         return contentResource;
+    }
+
+    @Override
+    public void deleteContent(final String contentPath) throws ContentException {
+        contentService.deleteContent(contentPath);
     }
 
     public void setContentService(final ContentService contentService) {

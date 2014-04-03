@@ -11,27 +11,28 @@ import javax.jcr.NodeIterator;
 import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
 
-import org.optigra.onionbowery.model.NodeContent;
+import org.optigra.onionbowery.model.Content;
 
 /**
  * @date Apr 2, 2014
  * @author ivanursul
  *
  */
-public class DefaultContentMapper implements ContentMapper<NodeContent> {
+public class DefaultContentMapper implements ContentMapper<Content> {
 
+    private static final String JCR_PREFIX = "jcr:";
     private static final String FILE = "file";
 
     @Override
-    public NodeContent map(final Node node) throws Exception {
+    public Content map(final Node node) throws Exception {
         
-        NodeContent nodeContent = new NodeContent();
+        Content content = new Content();
         
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, String> properties = new HashMap<String, String>();
         for (PropertyIterator iterator = node.getProperties(); iterator.hasNext();) {
             Property property = iterator.nextProperty();
             
-            if(!FILE.equals(property.getName())) {
+            if(!FILE.equals(property.getName()) && !property.getName().contains(JCR_PREFIX)) {
                 properties.put(property.getName(), property.getString());
             }
         }
@@ -42,15 +43,20 @@ public class DefaultContentMapper implements ContentMapper<NodeContent> {
             subNodes.add(nextNode.getName());
         }
         
-        Property fileProperty = node.getProperty(FILE);
-        InputStream inputStream = fileProperty.getBinary().getStream();
+        if(node.hasProperty(FILE)) {
+            Property fileProperty = node.getProperty(FILE);
+            InputStream inputStream = fileProperty.getBinary().getStream();
+            content.setInputStream(inputStream);
+        }
         
-        nodeContent.setName(node.getName());
-        nodeContent.setProperties(properties);
-        nodeContent.setSubNodes(subNodes);
-        nodeContent.setInputStream(inputStream);
+        content.setFileName(node.getName());
+        content.setProperties(properties);
+        content.setSubNodes(subNodes);
         
-        return nodeContent;
+        content.setContentId(node.getIdentifier());
+        content.setPath(node.getPath());
+        
+        return content;
     }
 
 }

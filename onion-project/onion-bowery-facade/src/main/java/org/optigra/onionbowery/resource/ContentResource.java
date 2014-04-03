@@ -1,5 +1,7 @@
 package org.optigra.onionbowery.resource;
 
+import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 
@@ -12,8 +14,12 @@ public class ContentResource {
     
     private String path;
     
-    private Map<String, String> attributes;
-
+    private Map<String, String> properties;
+    
+    private transient InputStream inputStream;
+    
+    private List<String> subNodes;
+    
     public String getContentId() {
         return contentId;
     }
@@ -38,22 +44,39 @@ public class ContentResource {
         this.path = path;
     }
 
-    public Map<String, String> getAttributes() {
-        return attributes;
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
-    public void setAttributes(final Map<String, String> attributes) {
-        this.attributes = attributes;
+    public void setProperties(final Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+    public InputStream getInputStream() {
+        return inputStream;
+    }
+
+    public void setInputStream(final InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
+    public List<String> getSubNodes() {
+        return subNodes;
+    }
+
+    public void setSubNodes(final List<String> subNodes) {
+        this.subNodes = subNodes;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
         result = prime * result + ((contentId == null) ? 0 : contentId.hashCode());
         result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
         result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + ((properties == null) ? 0 : properties.hashCode());
+        result = prime * result + ((subNodes == null) ? 0 : subNodes.hashCode());
         return result;
     }
 
@@ -66,11 +89,6 @@ public class ContentResource {
         if (getClass() != obj.getClass())
             return false;
         ContentResource other = (ContentResource) obj;
-        if (attributes == null) {
-            if (other.attributes != null)
-                return false;
-        } else if (!attributes.equals(other.attributes))
-            return false;
         if (contentId == null) {
             if (other.contentId != null)
                 return false;
@@ -86,12 +104,23 @@ public class ContentResource {
                 return false;
         } else if (!path.equals(other.path))
             return false;
+        if (properties == null) {
+            if (other.properties != null)
+                return false;
+        } else if (!properties.equals(other.properties))
+            return false;
+        if (subNodes == null) {
+            if (other.subNodes != null)
+                return false;
+        } else if (!subNodes.equals(other.subNodes))
+            return false;
         return true;
     }
 
     @Override
     public String toString() {
-        return "ContentResource [contentId=" + contentId + ", fileName=" + fileName + ", path=" + path + ", attributes=" + attributes + "]";
+        return "ContentResource [contentId=" + contentId + ", fileName=" + fileName + ", path=" + path + ", properties=" + properties + ", subNodes="
+                + subNodes + "]";
     }
     
 }

@@ -26,7 +26,7 @@ public class ContentConverterImplTest {
         source.setContentId(contentId);
         source.setFileName(fileName);
         source.setPath(path);
-        source.setStream(stream);
+        source.setInputStream(stream);
 
         ContentResource expected = new ContentResource();
         expected.setContentId(contentId);

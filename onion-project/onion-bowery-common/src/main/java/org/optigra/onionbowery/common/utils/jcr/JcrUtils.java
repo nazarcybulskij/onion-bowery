@@ -1,7 +1,6 @@
 package org.optigra.onionbowery.common.utils.jcr;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -24,7 +23,7 @@ public class JcrUtils {
         
         String extension = FilenameUtils.getExtension(filename);
         String clearName = filename.replace(DOT + extension, EMPTY_STRING);
-        String formattedFileName = clearName.replaceAll(SPECIAL_CHARACTERS_PATTERN, EMPTY_STRING).toLowerCase().trim() + "_" + Calendar.getInstance().getTimeInMillis();
+        String formattedFileName = clearName.replaceAll(SPECIAL_CHARACTERS_PATTERN, EMPTY_STRING).toLowerCase().trim();
         
         if(!extension.isEmpty()) {
             formattedFileName += DOT + extension;

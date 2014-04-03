@@ -11,16 +11,20 @@ import java.io.InputStream;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.optigra.onionbowery.dao.ContentRepository;
 import org.optigra.onionbowery.model.Content;
-import org.optigra.onionbowery.model.NodeContent;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultContentServiceTest {
 
+    @Captor
+    private ArgumentCaptor<String> stringCaptor;
+    
     @Mock
     private ContentRepository contentRepository;
     
@@ -32,12 +36,12 @@ public class DefaultContentServiceTest {
         // Given
         String path = "/path/to/file.ext";
         String name = "name";
-        NodeContent expectedContent = new NodeContent();
-        expectedContent.setName(name);
+        Content expectedContent = new Content();
+        expectedContent.setFileName(name);
         
         // When
         when(contentRepository.getContentByPath(anyString())).thenReturn(expectedContent);
-        NodeContent actualContent = unit.getContentByPath(path);
+        Content actualContent = unit.getContentByPath(path);
         
         // Then
         verify(contentRepository).getContentByPath(path);
@@ -51,17 +55,30 @@ public class DefaultContentServiceTest {
         String path = "/path/to/my/file.ext";
         
         Content content = new Content();
-        content.setStream(stream);
+        content.setInputStream(stream);
         content.setPath(path);
         
-        String expectedContentId = "contentId";
+        Content expectedContentId = new Content();
         
         // When
         when(contentRepository.storeContent(any(Content.class))).thenReturn(expectedContentId);
-        String actualContentId = unit.storeContent(content);
+        Content actualContent = unit.storeContent(content);
 
         // Then
         verify(contentRepository).storeContent(content);
-        assertEquals(expectedContentId, actualContentId);
+        assertEquals(expectedContentId, actualContent);
+    }
+    
+    @Test
+    public void testDeleteContent() throws Exception {
+        // Given
+        String contentPath = "/content/path";
+
+        // When
+        unit.deleteContent(contentPath);
+
+        // Then
+        verify(contentRepository).deleteContent(stringCaptor.capture());
+        assertEquals(contentPath, stringCaptor.getValue());
     }
 }

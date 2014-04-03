@@ -14,8 +14,13 @@ import java.util.Map;
 import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.jcr.Property;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.jcr.UnsupportedRepositoryOperationException;
+import javax.jcr.Workspace;
+import javax.jcr.version.VersionManager;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -24,7 +29,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.optigra.onionbowery.dao.jcr.JcrSessionFactory;
 import org.optigra.onionbowery.dao.mapper.ContentMapper;
 import org.optigra.onionbowery.model.Content;
-import org.optigra.onionbowery.model.NodeContent;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultContentRepositoryTest {
@@ -45,20 +49,33 @@ public class DefaultContentRepositoryTest {
     private Binary binary;
     
     @Mock
-    private ContentMapper<NodeContent> contentMapper;
+    private ContentMapper<Content> contentMapper;
+    
+    @Mock
+    private Workspace workspace;
+
+    @Mock
+    private VersionManager versionManager;
 
     @InjectMocks
     private DefaultContentRepository unit = new DefaultContentRepository();
 
+
+    @Before
+    public void setup() throws UnsupportedRepositoryOperationException, RepositoryException {
+        when(session.getWorkspace()).thenReturn(workspace);
+        when(workspace.getVersionManager()).thenReturn(versionManager);
+    }
+    
     @Test
     public void testGetContentByPath() throws Exception {
         // Given
         String contentId = "contentId";
         String name = "name";
         InputStream stream = new ByteArrayInputStream("somstring".getBytes("UTF-8"));
-        NodeContent expectedNodeContent = new NodeContent();
+        Content expectedNodeContent = new Content();
         expectedNodeContent.setInputStream(stream);
-        expectedNodeContent.setName(name);
+        expectedNodeContent.setFileName(name);
         
         
         // When
@@ -66,7 +83,7 @@ public class DefaultContentRepositoryTest {
         when(session.getNode(anyString())).thenReturn(node);
         when(contentMapper.map(any(Node.class))).thenReturn(expectedNodeContent);
         
-        NodeContent actualNodeContent = unit.getContentByPath(contentId);
+        Content actualNodeContent = unit.getContentByPath(contentId);
         
         // Then
         verify(sessionFactory).getCurrentSession();
@@ -86,12 +103,13 @@ public class DefaultContentRepositoryTest {
         Map<String, String> attributes = new HashMap<String, String>();
         Content content = new Content();
         content.setFileName(fileName);
-        content.setStream(stream);
+        content.setInputStream(stream);
         content.setPath(path);
-        content.setAttributes(attributes);
+        content.setProperties(attributes);
         
         // When
-        String expectedContentId = "contentId";
+        String contentId = "cotnentId";
+        Content expectedContent = new Content();
 
         when(session.getRootNode()).thenReturn(node);
         
@@ -106,9 +124,10 @@ public class DefaultContentRepositoryTest {
         
         when(sessionFactory.getCurrentSession()).thenReturn(session);
         when(node.addNode(anyString(), anyString())).thenReturn(node);
-        when(node.getIdentifier()).thenReturn(expectedContentId);
+        when(node.getIdentifier()).thenReturn(contentId);
+        when(contentMapper.map(any(Node.class))).thenReturn(expectedContent);
         
-        String actualContentId = unit.storeContent(content);
+        Content actualContent = unit.storeContent(content);
 
         // Then
         verify(sessionFactory).getCurrentSession();
@@ -116,7 +135,7 @@ public class DefaultContentRepositoryTest {
         verify(node).getIdentifier();
         verify(session).save();
         
-        assertEquals(expectedContentId, actualContentId);
+        assertEquals(expectedContent, actualContent);
     }
 
     @Test
@@ -129,12 +148,13 @@ public class DefaultContentRepositoryTest {
         Map<String, String> attributes = new HashMap<>();
         Content content = new Content();
         content.setFileName(fileName);
-        content.setStream(stream);
+        content.setInputStream(stream);
         content.setPath(path);
-        content.setAttributes(attributes);
+        content.setProperties(attributes);
         
         // When
-        String expectedContentId = "contentId";
+        String contentId = "contentId";
+        Content expectedContent = new Content();
         
         when(session.getRootNode()).thenReturn(node);
         
@@ -149,9 +169,10 @@ public class DefaultContentRepositoryTest {
         
         when(sessionFactory.getCurrentSession()).thenReturn(session);
         when(node.addNode(anyString(), anyString())).thenReturn(node);
-        when(node.getIdentifier()).thenReturn(expectedContentId);
+        when(node.getIdentifier()).thenReturn(contentId);
+        when(contentMapper.map(any(Node.class))).thenReturn(expectedContent);
         
-        String actualContentId = unit.storeContent(content);
+        Content actualContent = unit.storeContent(content);
         
         // Then
         verify(sessionFactory).getCurrentSession();
@@ -159,7 +180,7 @@ public class DefaultContentRepositoryTest {
         verify(node).getIdentifier();
         verify(session).save();
         
-        assertEquals(expectedContentId, actualContentId);
+        assertEquals(expectedContent, actualContent);
     }
 
     @Test
@@ -172,12 +193,13 @@ public class DefaultContentRepositoryTest {
         Map<String, String> attributes = new HashMap<>();
         Content content = new Content();
         content.setFileName(fileName);
-        content.setStream(stream);
+        content.setInputStream(stream);
         content.setPath(path);
-        content.setAttributes(attributes);
+        content.setProperties(attributes);
         
         // When
         String expectedContentId = "contentId";
+        Content expectedContent = new Content();
         
         when(session.getRootNode()).thenReturn(node);
         
@@ -193,8 +215,9 @@ public class DefaultContentRepositoryTest {
         when(sessionFactory.getCurrentSession()).thenReturn(session);
         when(node.addNode(anyString(), anyString())).thenReturn(node);
         when(node.getIdentifier()).thenReturn(expectedContentId);
+        when(contentMapper.map(any(Node.class))).thenReturn(expectedContent);
         
-        String actualContentId = unit.storeContent(content);
+        Content actualContent = unit.storeContent(content);
         
         // Then
         verify(sessionFactory).getCurrentSession();
@@ -202,6 +225,22 @@ public class DefaultContentRepositoryTest {
         verify(node).getIdentifier();
         verify(session).save();
         
-        assertEquals(expectedContentId, actualContentId);
+        assertEquals(expectedContent, actualContent);
+    }
+    
+    @Test
+    public void testDeleteRepository() throws Exception {
+        // Given
+        String contentPath = "/content/path";
+
+        // When
+        when(sessionFactory.getCurrentSession()).thenReturn(session);
+        when(session.getNode(anyString())).thenReturn(node);
+        
+        unit.deleteContent(contentPath);
+
+        // Then
+        verify(node).remove();
+        verify(session).getNode(contentPath);
     }
 }

@@ -8,7 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.optigra.onionbowery.common.exception.ContentNotFoundException;
 import org.optigra.onionbowery.controller.AbstractController;
 import org.optigra.onionbowery.facade.content.ContentFacade;
-import org.optigra.onionbowery.model.NodeContent;
+import org.optigra.onionbowery.resource.ContentResource;
 import org.optigra.onionbowery.servlet.request.RequestWrapper;
 import org.optigra.onionbowery.servlet.response.ResponseWrapper;
 
@@ -18,18 +18,16 @@ import org.optigra.onionbowery.servlet.response.ResponseWrapper;
  *
  */
 public class ContentGetController extends AbstractController {
-
-    private static final String CONTENT_REQUEST_TYPE = "content";
     
     private ContentFacade contentFacade;
     
     @Override
     public void handle(final RequestWrapper request, final ResponseWrapper response) throws ContentNotFoundException, IOException {
         
-        String contentPath = request.getParameter("contentPath");
-        String requestType = request.getParameter("requestType");
+        String contentPath = getRequestParam(request, CONTENT_PATH);
+        String requestType = getRequestParam(request, REQUEST_TYPE, CONTENT_REQUEST_TYPE);
         
-        NodeContent nodeContent = contentFacade.getContentByPath(contentPath);
+        ContentResource nodeContent = contentFacade.getContentByPath(contentPath);
         
         if(requestType == null || CONTENT_REQUEST_TYPE.equals(requestType)) {
             InputStream in = nodeContent.getInputStream();
