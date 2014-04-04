@@ -1,6 +1,7 @@
 package org.optigra.onionbowery.resource;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,8 @@ public class ContentResource {
     private String path;
     
     private Map<String, String> properties;
+    
+    private Collection<String> versions;
     
     private transient InputStream inputStream;
     
@@ -68,6 +71,14 @@ public class ContentResource {
         this.subNodes = subNodes;
     }
 
+    public Collection<String> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(final Collection<String> versions) {
+        this.versions = versions;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -77,6 +88,7 @@ public class ContentResource {
         result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result + ((properties == null) ? 0 : properties.hashCode());
         result = prime * result + ((subNodes == null) ? 0 : subNodes.hashCode());
+        result = prime * result + ((versions == null) ? 0 : versions.hashCode());
         return result;
     }
 
@@ -114,13 +126,18 @@ public class ContentResource {
                 return false;
         } else if (!subNodes.equals(other.subNodes))
             return false;
+        if (versions == null) {
+            if (other.versions != null)
+                return false;
+        } else if (!versions.equals(other.versions))
+            return false;
         return true;
     }
 
     @Override
     public String toString() {
-        return "ContentResource [contentId=" + contentId + ", fileName=" + fileName + ", path=" + path + ", properties=" + properties + ", subNodes="
-                + subNodes + "]";
+        return "ContentResource [contentId=" + contentId + ", fileName=" + fileName + ", path=" + path + ", properties=" + properties + ", versions="
+                + versions + ", subNodes=" + subNodes + "]";
     }
     
 }

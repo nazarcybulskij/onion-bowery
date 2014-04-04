@@ -18,6 +18,9 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.UnsupportedRepositoryOperationException;
 import javax.jcr.Workspace;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
+import javax.jcr.version.VersionIterator;
 import javax.jcr.version.VersionManager;
 
 import org.junit.Before;
@@ -57,8 +60,18 @@ public class DefaultContentRepositoryTest {
     @Mock
     private VersionManager versionManager;
 
+    @Mock
+    private VersionHistory versionHistory;
+
+    @Mock
+    private VersionIterator versionIterator;
+
+    @Mock
+    private Version vers;
+
     @InjectMocks
     private DefaultContentRepository unit = new DefaultContentRepository();
+
 
 
     @Before
@@ -72,18 +85,24 @@ public class DefaultContentRepositoryTest {
         // Given
         String contentId = "contentId";
         String name = "name";
+        double version = 1.1;
         InputStream stream = new ByteArrayInputStream("somstring".getBytes("UTF-8"));
         Content expectedNodeContent = new Content();
         expectedNodeContent.setInputStream(stream);
         expectedNodeContent.setFileName(name);
         
-        
         // When
         when(sessionFactory.getCurrentSession()).thenReturn(session);
         when(session.getNode(anyString())).thenReturn(node);
+        when(session.getWorkspace()).thenReturn(workspace);
+        when(workspace.getVersionManager()).thenReturn(versionManager);
+        when(versionManager.getVersionHistory(anyString())).thenReturn(versionHistory);
+        when(versionHistory.getAllVersions()).thenReturn(versionIterator);
+        when(versionIterator.hasNext()).thenReturn(false);
+        when(versionHistory.getVersion(anyString())).thenReturn(vers);
         when(contentMapper.map(any(Node.class))).thenReturn(expectedNodeContent);
-        
-        Content actualNodeContent = unit.getContentByPath(contentId);
+        when(vers.getFrozenNode()).thenReturn(node);
+        Content actualNodeContent = unit.getContentByPath(contentId ,version);
         
         // Then
         verify(sessionFactory).getCurrentSession();

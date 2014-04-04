@@ -2,6 +2,7 @@ package org.optigra.onionbowery.service.content;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,15 +37,16 @@ public class DefaultContentServiceTest {
         // Given
         String path = "/path/to/file.ext";
         String name = "name";
+        double version = 1.1;
         Content expectedContent = new Content();
         expectedContent.setFileName(name);
         
         // When
-        when(contentRepository.getContentByPath(anyString())).thenReturn(expectedContent);
-        Content actualContent = unit.getContentByPath(path);
+        when(contentRepository.getContentByPath(anyString(), anyDouble())).thenReturn(expectedContent);
+        Content actualContent = unit.getContentByPath(path, version);
         
         // Then
-        verify(contentRepository).getContentByPath(path);
+        verify(contentRepository).getContentByPath(path, version);
         assertEquals(expectedContent, actualContent);
     }
     

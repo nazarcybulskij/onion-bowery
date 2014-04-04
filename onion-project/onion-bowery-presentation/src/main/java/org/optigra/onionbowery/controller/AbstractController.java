@@ -3,8 +3,6 @@ package org.optigra.onionbowery.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.optigra.onionbowery.resource.MessageResource;
 import org.optigra.onionbowery.resource.MessageType;
 import org.optigra.onionbowery.servlet.request.RequestWrapper;
@@ -23,6 +21,7 @@ import com.google.gson.GsonBuilder;
 public abstract class AbstractController implements Controller {
     private static final Logger logger = LoggerFactory.getLogger(AbstractController.class);
     
+    protected static final String CONTENT_VERSION = "contentVersion";
     protected static final String CONTENT_PATH = "contentPath";
     protected static final String REQUEST_TYPE = "requestType";
     protected static final String CONTENT_REQUEST_TYPE = "content";
@@ -41,15 +40,6 @@ public abstract class AbstractController implements Controller {
         MessageResource messageResource = new MessageResource(MessageType.WARN, message);
         String json = gson.toJson(messageResource);
         writer.write(json);
-    }
-    
-    protected String getRequestParam(final HttpServletRequest request, final String paramName, final String defaultValue) {
-        String requestParam = getRequestParam(request, paramName);
-        return requestParam != null ? requestParam : defaultValue; 
-    }
-    
-    protected String getRequestParam(final HttpServletRequest request, final String paramName) {
-        return request.getParameter(paramName);
     }
 
 }

@@ -1,6 +1,7 @@
 package org.optigra.onionbowery.model;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 public class Content {
@@ -16,6 +17,8 @@ public class Content {
 	private Map<String, String> properties;
 	
     private List<String> subNodes;
+    
+    private Collection<String> versions;
 
 	public String getPath() {
         return path;
@@ -65,16 +68,24 @@ public class Content {
         this.subNodes = subNodes;
     }
 
+    public Collection<String> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(final Collection<String> versions) {
+        this.versions = versions;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((properties == null) ? 0 : properties.hashCode());
         result = prime * result + ((contentId == null) ? 0 : contentId.hashCode());
         result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
         result = prime * result + ((path == null) ? 0 : path.hashCode());
-        result = prime * result + ((inputStream == null) ? 0 : inputStream.hashCode());
+        result = prime * result + ((properties == null) ? 0 : properties.hashCode());
         result = prime * result + ((subNodes == null) ? 0 : subNodes.hashCode());
+        result = prime * result + ((versions == null) ? 0 : versions.hashCode());
         return result;
     }
 
@@ -87,11 +98,6 @@ public class Content {
         if (getClass() != obj.getClass())
             return false;
         Content other = (Content) obj;
-        if (properties == null) {
-            if (other.properties != null)
-                return false;
-        } else if (!properties.equals(other.properties))
-            return false;
         if (contentId == null) {
             if (other.contentId != null)
                 return false;
@@ -107,23 +113,28 @@ public class Content {
                 return false;
         } else if (!path.equals(other.path))
             return false;
-        if (inputStream == null) {
-            if (other.inputStream != null)
+        if (properties == null) {
+            if (other.properties != null)
                 return false;
-        } else if (!inputStream.equals(other.inputStream))
+        } else if (!properties.equals(other.properties))
             return false;
         if (subNodes == null) {
             if (other.subNodes != null)
                 return false;
         } else if (!subNodes.equals(other.subNodes))
             return false;
+        if (versions == null) {
+            if (other.versions != null)
+                return false;
+        } else if (!versions.equals(other.versions))
+            return false;
         return true;
     }
 
     @Override
     public String toString() {
-        return "Content [contentId=" + contentId + ", fileName=" + fileName + ", path=" + path + ", stream=" + inputStream + ", attributes=" + properties
-                + ", subNodes=" + subNodes + "]";
+        return "Content [contentId=" + contentId + ", fileName=" + fileName + ", path=" + path + ", properties=" + properties + ", subNodes=" + subNodes
+                + ", versions=" + versions + "]";
     }
-
+    
 }

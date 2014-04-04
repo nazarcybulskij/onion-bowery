@@ -14,6 +14,7 @@ public class ContentConverterImpl extends AbstractConverter<Content, ContentReso
         target.setInputStream(source.getInputStream());
         target.setProperties(source.getProperties());
         target.setSubNodes(source.getSubNodes());
+        target.setVersions(source.getVersions());
         
         return target;
     }

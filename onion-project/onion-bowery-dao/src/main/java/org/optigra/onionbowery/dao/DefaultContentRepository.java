@@ -1,22 +1,25 @@
 package org.optigra.onionbowery.dao;
 
 import java.io.IOException;
+import java.util.Deque;
+import java.util.LinkedList;
 
 import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.ValueFormatException;
-import javax.jcr.Workspace;
 import javax.jcr.lock.LockException;
 import javax.jcr.nodetype.ConstraintViolationException;
 import javax.jcr.nodetype.NodeType;
+import javax.jcr.version.Version;
 import javax.jcr.version.VersionException;
+import javax.jcr.version.VersionHistory;
+import javax.jcr.version.VersionIterator;
 
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.value.BinaryImpl;
 import org.optigra.onionbowery.common.exception.ContentException;
-import org.optigra.onionbowery.common.exception.ContentNotFoundException;
 import org.optigra.onionbowery.common.utils.jcr.JcrUtils;
 import org.optigra.onionbowery.dao.jcr.JcrSessionFactory;
 import org.optigra.onionbowery.dao.mapper.ContentMapper;
@@ -27,6 +30,8 @@ import org.slf4j.LoggerFactory;
 public class DefaultContentRepository implements ContentRepository {
     private static final Logger logger = LoggerFactory.getLogger(DefaultContentRepository.class);
 
+    private static final String JCR_PREFIX = "jcr:";
+    
     private static final String FILE = "file";
     
     private JcrSessionFactory sessionFactory;
@@ -37,39 +42,48 @@ public class DefaultContentRepository implements ContentRepository {
     public Content storeContent(final Content content) throws ContentException {
         Session session = null;
         Content result = null;
-        
         try {
             session = sessionFactory.getCurrentSession();
-            Workspace workspace = session.getWorkspace();
+            Node node = getAppropriateToContentNode(session, content);
             
-            Node root = getLastNode(session.getRootNode(), content.getPath());
-            
-            String validFileName = JcrUtils.getValidFilename(content.getFileName());
-            
-            Node node = null;
-            
-            if(root.hasNode(validFileName)) {
-                node = root.getNode(validFileName);
-                workspace.getVersionManager().checkout(node.getPath());
-            } else {
-                node = root.addNode(validFileName, NodeType.NT_UNSTRUCTURED);
-                node.addMixin(JcrConstants.MIX_VERSIONABLE);
-            }
-            
-            setProperties(content, node);
-            String contentId = node.getIdentifier();
-            
+            processNodeProperties(content, node);
+
             result = contentMapper.map(node);
             
-            logger.info(String.format("Content stored, id: %s", contentId));
-            
             session.save();
-            workspace.getVersionManager().checkin(node.getPath());
+            session.getWorkspace().getVersionManager().checkin(node.getPath());
+            logger.info(String.format("Content stored, id: %s", node.getIdentifier()));
         } catch (Throwable e) {
             throw new ContentException("Errors during storing content");
         }
         
         return result;
+    }
+
+    /**
+     * The method is getting your file, according path, and filename.
+     * @date Apr 4, 2014
+     * @author ivanursul
+     * @param session
+     * @param content
+     * @return
+     * @throws Exception
+     */
+    private Node getAppropriateToContentNode(final Session session, final Content content) throws Exception {
+        
+        Node lastNode = getLastNodeFromPath(session.getRootNode(), content.getPath());
+        String validFileName =  JcrUtils.getValidFilename(content.getFileName());
+        
+        Node node;
+        if(lastNode.hasNode(validFileName)) {
+            node = lastNode.getNode(validFileName);
+            session.getWorkspace().getVersionManager().checkout(node.getPath());
+        } else {
+            node = lastNode.addNode(validFileName, NodeType.NT_UNSTRUCTURED);
+            node.addMixin(JcrConstants.MIX_VERSIONABLE);
+        }
+        
+        return node;
     }
 
     /**
@@ -85,7 +99,7 @@ public class DefaultContentRepository implements ContentRepository {
      * @return The last node.
      * @throws RepositoryException
      */
-    private Node getLastNode(final Node node, final String path) throws RepositoryException {
+    private Node getLastNodeFromPath(final Node node, final String path) throws RepositoryException {
         
         if (path.isEmpty()) {
             return node;
@@ -101,10 +115,10 @@ public class DefaultContentRepository implements ContentRepository {
             nextNode.addMixin(JcrConstants.MIX_VERSIONABLE);
         }
         
-        return getLastNode(nextNode, JcrUtils.reducePath(path));
+        return getLastNodeFromPath(nextNode, JcrUtils.reducePath(path));
     }
 
-    private void setProperties(final Content content, final Node node) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException, IOException {
+    private void processNodeProperties(final Content content, final Node node) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException, IOException {
         Binary binary = new BinaryImpl(content.getInputStream());
 
         node.setProperty(FILE, binary);
@@ -115,26 +129,51 @@ public class DefaultContentRepository implements ContentRepository {
     }
 
     @Override
-    public Content getContentByPath(final String path) throws ContentNotFoundException {
+    public Content getContentByPath(final String path, final double versionNumber) throws ContentException {
         Session session = null;
         Content nodeContent = null;
         
         try {
             session = sessionFactory.getCurrentSession();
-            Node node = session.getNode(path);
+            VersionHistory history = session.getWorkspace().getVersionManager().getVersionHistory(path);
+            Node basicNode = session.getNode(path);
+            
+            Node node = null;
+
+            Deque<String> versions = getVersions(history);
+            
+            // Default value
+            if(versionNumber == 0.0) {
+                node = history.getVersion(versions.getLast()).getFrozenNode();
+            } else {
+                node = history.getVersion(String.valueOf(versionNumber)).getFrozenNode();
+            }
+            
             nodeContent = contentMapper.map(node);
+            nodeContent.setVersions(versions);
             
-/*            VersionHistory history = session.getWorkspace().getVersionManager().getVersionHistory(path);
-            for (VersionIterator it = history.getAllVersions(); it.hasNext();) {
-                Version version = (Version) it.next();
-                logger.info("Version: " + version.getName());
-            }*/
-            
+            // TODO : repeating it, due to bad names in version nodes.
+            // Need to think, how to remove it.
+            nodeContent.setPath(path);
+            nodeContent.setFileName(basicNode.getName());
         } catch (Throwable e) {
-            throw new ContentNotFoundException("Content not found");
+            throw new ContentException("Content not found");
         }
         
         return nodeContent;
+    }
+    
+    private Deque<String> getVersions(final VersionHistory history) throws Exception {
+        LinkedList<String> versions = new LinkedList<>();
+        
+        for (VersionIterator it = history.getAllVersions(); it.hasNext();) {
+            Version version = (Version) it.next();
+            if(!version.getName().contains(JCR_PREFIX)) {
+                versions.add(version.getName());
+            }
+        }
+        
+        return versions;
     }
 
 

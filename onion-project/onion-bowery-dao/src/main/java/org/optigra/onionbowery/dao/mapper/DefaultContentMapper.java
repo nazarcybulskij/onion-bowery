@@ -43,6 +43,7 @@ public class DefaultContentMapper implements ContentMapper<Content> {
             subNodes.add(nextNode.getName());
         }
         
+        // Need to check, in case, when node is only a "folder" and contains no files.
         if(node.hasProperty(FILE)) {
             Property fileProperty = node.getProperty(FILE);
             InputStream inputStream = fileProperty.getBinary().getStream();

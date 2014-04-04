@@ -2,6 +2,7 @@ package org.optigra.onionbowery.facade.content;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,6 +48,7 @@ public class DefaultContentFacadeTest {
         // Given
         String contentPath = "/contentPath";
         String name = "name";
+        double version = 1.2;
         
         Content content = new Content();
         content.setFileName(name);
@@ -56,13 +58,13 @@ public class DefaultContentFacadeTest {
         expectedNodeContent.setFileName(name);
         
         // When
-        when(contentService.getContentByPath(anyString())).thenReturn(content);
+        when(contentService.getContentByPath(anyString(), anyDouble())).thenReturn(content);
         when(contentConverter.convert(any(Content.class))).thenReturn(expectedNodeContent);
         
-        ContentResource actualNodeContent = unit.getContentByPath(contentPath);
+        ContentResource actualNodeContent = unit.getContentByPath(contentPath, version);
 
         // Then
-        verify(contentService).getContentByPath(contentPath);
+        verify(contentService).getContentByPath(contentPath, version);
         verify(contentConverter).convert(content);
         assertEquals(expectedNodeContent, actualNodeContent);
     }

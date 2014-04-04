@@ -17,7 +17,7 @@ public class ContentDeleteController extends AbstractController {
     
     @Override
     public void handle(final RequestWrapper req, final ResponseWrapper resp) throws Exception {
-        String contentPath = getRequestParam(req, CONTENT_PATH);
+        String contentPath = req.getParameter(CONTENT_PATH);
         contentFacade.deleteContent(contentPath);
     }
 

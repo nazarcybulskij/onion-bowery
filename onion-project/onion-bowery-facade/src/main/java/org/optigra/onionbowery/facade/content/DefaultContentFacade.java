@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.optigra.onionbowery.common.exception.ContentException;
-import org.optigra.onionbowery.common.exception.ContentNotFoundException;
 import org.optigra.onionbowery.facade.converter.Converter;
 import org.optigra.onionbowery.model.Content;
 import org.optigra.onionbowery.resource.ContentResource;
@@ -17,9 +16,9 @@ public class DefaultContentFacade implements ContentFacade {
     private Converter<Content, ContentResource> contentConverter;
 	
 	@Override
-	public ContentResource getContentByPath(final String contentPath) throws ContentNotFoundException {
+	public ContentResource getContentByPath(final String contentPath, final double version) throws ContentException {
 	    
-	    Content content = contentService.getContentByPath(contentPath);
+	    Content content = contentService.getContentByPath(contentPath, version);
 	    ContentResource contentResource = contentConverter.convert(content);
 	    
 	    return contentResource;
