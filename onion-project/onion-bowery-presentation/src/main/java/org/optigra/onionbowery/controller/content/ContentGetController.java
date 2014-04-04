@@ -16,6 +16,7 @@ import org.optigra.onionbowery.servlet.response.ResponseWrapper;
  *
  */
 public class ContentGetController extends AbstractController {
+    
     private ContentFacade contentFacade;
     
     @Override

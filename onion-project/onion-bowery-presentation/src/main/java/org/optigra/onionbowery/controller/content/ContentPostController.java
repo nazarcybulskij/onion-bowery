@@ -33,16 +33,16 @@ public class ContentPostController extends AbstractController {
         
         Map<String, FileItem> requestParams = getParameters(request);
         
-        Map<String, String> attributes = getContentAttributes(requestParams);
+        Map<String, String> parameters = getContentParameters(requestParams);
         String path = requestParams.get("path").getString();
         FileItem fileItem = requestParams.get("file");
         
-        ContentResource content = contentFacade.storeContent(fileItem.getInputStream(), fileItem.getName(), path, attributes);
+        ContentResource content = contentFacade.storeContent(fileItem.getInputStream(), fileItem.getName(), path, parameters);
         
         response.setResponseObject(content);
     }
 
-    private Map<String, String> getContentAttributes(final Map<String, FileItem> parameters) {
+    private Map<String, String> getContentParameters(final Map<String, FileItem> parameters) {
         
         Map<String, String> attributes = new HashMap<>();
         

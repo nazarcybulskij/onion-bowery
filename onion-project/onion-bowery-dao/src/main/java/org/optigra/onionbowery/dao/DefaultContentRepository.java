@@ -28,6 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DefaultContentRepository implements ContentRepository {
+    /**
+     * 
+     */
+    private static final String EMPTY_STRING = "";
+
     private static final Logger logger = LoggerFactory.getLogger(DefaultContentRepository.class);
 
     private static final String JCR_PREFIX = "jcr:";
@@ -54,6 +59,7 @@ public class DefaultContentRepository implements ContentRepository {
             session.getWorkspace().getVersionManager().checkin(node.getPath());
             logger.info(String.format("Content stored, id: %s", node.getIdentifier()));
         } catch (Throwable e) {
+            logger.warn(e.getMessage());
             throw new ContentException("Errors during storing content");
         }
         
@@ -108,7 +114,9 @@ public class DefaultContentRepository implements ContentRepository {
         String currentPath = JcrUtils.getFirstPathItem(path);
         Node nextNode = null;
         
-        if(node.hasNode(currentPath)) {
+        if(EMPTY_STRING.equals(currentPath)) {
+            nextNode = node;
+        } else if(node.hasNode(currentPath)) {
             nextNode = node.getNode(currentPath);
         } else {
             nextNode = node.addNode(currentPath, NodeType.NT_UNSTRUCTURED);
@@ -157,6 +165,7 @@ public class DefaultContentRepository implements ContentRepository {
             nodeContent.setPath(path);
             nodeContent.setFileName(basicNode.getName());
         } catch (Throwable e) {
+            logger.warn(e.getMessage());
             throw new ContentException("Content not found");
         }
         

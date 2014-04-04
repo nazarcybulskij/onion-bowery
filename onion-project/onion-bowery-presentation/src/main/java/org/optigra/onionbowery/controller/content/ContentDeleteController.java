@@ -2,6 +2,8 @@ package org.optigra.onionbowery.controller.content;
 
 import org.optigra.onionbowery.controller.AbstractController;
 import org.optigra.onionbowery.facade.content.ContentFacade;
+import org.optigra.onionbowery.resource.MessageResource;
+import org.optigra.onionbowery.resource.MessageType;
 import org.optigra.onionbowery.servlet.request.RequestWrapper;
 import org.optigra.onionbowery.servlet.response.ResponseWrapper;
 
@@ -12,13 +14,15 @@ import org.optigra.onionbowery.servlet.response.ResponseWrapper;
  */
 public class ContentDeleteController extends AbstractController {
 
-    private static final String CONTENT_PATH = "contentPath";
     private ContentFacade contentFacade;
     
     @Override
-    public void handle(final RequestWrapper req, final ResponseWrapper resp) throws Exception {
-        String contentPath = req.getParameter(CONTENT_PATH);
+    public void handle(final RequestWrapper request, final ResponseWrapper response) throws Exception {
+        String contentPath = request.getParameter(CONTENT_PATH);
         contentFacade.deleteContent(contentPath);
+        
+        MessageResource messageResource = new MessageResource(MessageType.INFO, "Message deleted successfuly");
+        response.setResponseObject(messageResource);
     }
 
     public void setContentFacade(final ContentFacade contentFacade) {

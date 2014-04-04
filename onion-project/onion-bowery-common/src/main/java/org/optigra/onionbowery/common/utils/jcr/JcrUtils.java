@@ -34,6 +34,10 @@ public class JcrUtils {
     
     public static String reducePath(final String path) {
         
+        if(EMPTY_STRING.equals(path)) {
+            return EMPTY_STRING;
+        }
+        
         String[] paths = path.replaceFirst(SLASH_REGEX, EMPTY_STRING).split(SLASH);
         
         Queue<String> queue = new LinkedList<>(Arrays.asList(paths));
