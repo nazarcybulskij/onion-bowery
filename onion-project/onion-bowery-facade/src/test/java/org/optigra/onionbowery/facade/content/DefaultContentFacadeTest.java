@@ -76,6 +76,7 @@ public class DefaultContentFacadeTest {
         String fileName = "fileName";
         InputStream stream = new ByteArrayInputStream(inputContent.getBytes());
         String path = "/common/fileName";
+        String contentType = "contentType";
         Map<String, String> attributes = Collections.emptyMap();
 
         ContentResource expectedContentResource = new ContentResource();
@@ -85,12 +86,13 @@ public class DefaultContentFacadeTest {
         content.setPath(path);
         content.setInputStream(stream);
         content.setFileName(fileName);
+        content.setContentType(contentType);
         content.setProperties(attributes);
         
         // When
         when(contentConverter.convert(any(Content.class))).thenReturn(expectedContentResource);
         
-        ContentResource actualContentResource = unit.storeContent(stream, fileName, path, attributes);
+        ContentResource actualContentResource = unit.storeContent(stream, contentType, fileName, path, attributes);
 
         // Then
         verify(contentService).storeContent(contentCaptor.capture());

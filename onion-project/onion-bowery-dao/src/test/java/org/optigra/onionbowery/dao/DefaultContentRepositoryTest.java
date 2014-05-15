@@ -3,6 +3,7 @@ package org.optigra.onionbowery.dao;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -83,7 +84,7 @@ public class DefaultContentRepositoryTest {
     @Test
     public void testGetContentByPath() throws Exception {
         // Given
-        String contentId = "contentId";
+        String path = "contentId";
         String name = "name";
         double version = 1.1;
         InputStream stream = new ByteArrayInputStream("somstring".getBytes("UTF-8"));
@@ -102,11 +103,11 @@ public class DefaultContentRepositoryTest {
         when(versionHistory.getVersion(anyString())).thenReturn(vers);
         when(contentMapper.map(any(Node.class))).thenReturn(expectedNodeContent);
         when(vers.getFrozenNode()).thenReturn(node);
-        Content actualNodeContent = unit.getContentByPath(contentId ,version);
+        Content actualNodeContent = unit.getContentByPath(path ,version);
         
         // Then
         verify(sessionFactory).getCurrentSession();
-        verify(session).getNode(contentId);
+        verify(session, times(2)).getNode(path);
         verify(contentMapper).map(node);
         
         assertEquals(expectedNodeContent, actualNodeContent);

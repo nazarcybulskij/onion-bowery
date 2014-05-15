@@ -28,23 +28,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DefaultContentRepository implements ContentRepository {
-    /**
-     * 
-     */
-    private static final String EMPTY_STRING = "";
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultContentRepository.class);
 
+    private static final String FOLDER = "folder";
+    private static final String EMPTY_STRING = "";
     private static final String JCR_PREFIX = "jcr:";
-    
     private static final String FILE = "file";
-    
+    private static final String CONTENT_TYPE = "contentType";
+
     private JcrSessionFactory sessionFactory;
     
     private ContentMapper<Content> contentMapper;
     
     @Override
-    public Content storeContent(final Content content) throws ContentException {
+    public Content storeContent(final Content content) {
         Session session = null;
         Content result = null;
         try {
@@ -60,7 +58,7 @@ public class DefaultContentRepository implements ContentRepository {
             logger.info(String.format("Content stored, id: %s", node.getIdentifier()));
         } catch (Throwable e) {
             logger.warn(e.getMessage());
-            throw new ContentException("Errors during storing content");
+            throw new ContentException("Errors during storing content", e);
         }
         
         return result;
@@ -121,6 +119,7 @@ public class DefaultContentRepository implements ContentRepository {
         } else {
             nextNode = node.addNode(currentPath, NodeType.NT_UNSTRUCTURED);
             nextNode.addMixin(JcrConstants.MIX_VERSIONABLE);
+            nextNode.setProperty(CONTENT_TYPE, FOLDER);
         }
         
         return getLastNodeFromPath(nextNode, JcrUtils.reducePath(path));
@@ -130,6 +129,7 @@ public class DefaultContentRepository implements ContentRepository {
         Binary binary = new BinaryImpl(content.getInputStream());
 
         node.setProperty(FILE, binary);
+        node.setProperty(CONTENT_TYPE, content.getContentType());
         
         for (String key : content.getProperties().keySet()) {
             node.setProperty(key, content.getProperties().get(key));
@@ -146,16 +146,8 @@ public class DefaultContentRepository implements ContentRepository {
             VersionHistory history = session.getWorkspace().getVersionManager().getVersionHistory(path);
             Node basicNode = session.getNode(path);
             
-            Node node = null;
-
             Deque<String> versions = getVersions(history);
-            
-            // Default value
-            if(versionNumber == 0.0) {
-                node = history.getVersion(versions.getLast()).getFrozenNode();
-            } else {
-                node = history.getVersion(String.valueOf(versionNumber)).getFrozenNode();
-            }
+            Node node  = getRequiredNode(path, versionNumber, session, versions);
             
             nodeContent = contentMapper.map(node);
             nodeContent.setVersions(versions);
@@ -166,10 +158,26 @@ public class DefaultContentRepository implements ContentRepository {
             nodeContent.setFileName(basicNode.getName());
         } catch (Throwable e) {
             logger.warn(e.getMessage());
-            throw new ContentException("Content not found");
+            throw new ContentException("Content not found", e);
         }
         
         return nodeContent;
+    }
+
+    private Node getRequiredNode(final String path, final double versionNumber, final Session session, final Deque<String> versions) throws Exception {
+        
+        VersionHistory history = session.getWorkspace().getVersionManager().getVersionHistory(path);
+        Node node;
+        
+        if(versions.size() == 0) {
+            node = session.getNode(path);
+        } else if(versionNumber == 0.0) {
+            node = history.getVersion(versions.getLast()).getFrozenNode();
+        } else {
+            node = history.getVersion(String.valueOf(versionNumber)).getFrozenNode();
+        }
+        
+        return node;
     }
     
     private Deque<String> getVersions(final VersionHistory history) throws Exception {

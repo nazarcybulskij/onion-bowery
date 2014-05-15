@@ -55,6 +55,7 @@ public class ContentGetControllerTest {
         String expectedContent = "content";
         InputStream inputStream = new ByteArrayInputStream(expectedContent.getBytes());
         
+        
         ByteArrayServletOutputStream outputStream = new ByteArrayServletOutputStream(expectedContent.getBytes().length);
         
         ContentResource contentResourse = new ContentResource();

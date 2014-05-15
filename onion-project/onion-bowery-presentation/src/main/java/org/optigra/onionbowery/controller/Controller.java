@@ -1,8 +1,6 @@
 package org.optigra.onionbowery.controller;
 
 
-import java.io.IOException;
-
 import org.optigra.onionbowery.servlet.request.RequestWrapper;
 import org.optigra.onionbowery.servlet.response.ResponseWrapper;
 
@@ -15,6 +13,6 @@ public interface Controller {
     
     void handle(RequestWrapper req, ResponseWrapper resp) throws Exception;
     
-    void handleException(RequestWrapper req, ResponseWrapper resp, Exception e) throws IOException;
+    void handleException(RequestWrapper req, ResponseWrapper resp, Exception e);
 
 }

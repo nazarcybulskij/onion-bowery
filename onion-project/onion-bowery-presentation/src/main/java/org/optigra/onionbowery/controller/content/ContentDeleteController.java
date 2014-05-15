@@ -8,6 +8,8 @@ import org.optigra.onionbowery.servlet.request.RequestWrapper;
 import org.optigra.onionbowery.servlet.response.ResponseWrapper;
 
 /**
+ * Controller for deleting content
+ * 
  * @date Apr 3, 2014
  * @author ivanursul
  *
@@ -17,7 +19,7 @@ public class ContentDeleteController extends AbstractController {
     private ContentFacade contentFacade;
     
     @Override
-    public void handle(final RequestWrapper request, final ResponseWrapper response) throws Exception {
+    public void handle(final RequestWrapper request, final ResponseWrapper response) {
         String contentPath = request.getParameter(CONTENT_PATH);
         contentFacade.deleteContent(contentPath);
         

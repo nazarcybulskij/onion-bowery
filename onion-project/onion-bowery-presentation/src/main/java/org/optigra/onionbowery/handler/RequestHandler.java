@@ -1,7 +1,5 @@
-package org.optigra.onionbowery.servlet.request.dispatcher;
+package org.optigra.onionbowery.handler;
 
-
-import java.io.IOException;
 
 import org.optigra.onionbowery.servlet.request.RequestWrapper;
 import org.optigra.onionbowery.servlet.response.ResponseWrapper;
@@ -13,6 +11,6 @@ import org.optigra.onionbowery.servlet.response.ResponseWrapper;
  */
 public interface RequestHandler {
 
-    void handle(RequestWrapper req, ResponseWrapper res) throws IOException;
+    void handle(RequestWrapper req, ResponseWrapper res);
     
 }

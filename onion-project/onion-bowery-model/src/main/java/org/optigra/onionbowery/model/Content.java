@@ -12,6 +12,8 @@ public class Content {
     
 	private String path;
 	
+	private String contentType;
+	
 	private transient InputStream inputStream;
 	
 	private Map<String, String> properties;
@@ -76,11 +78,20 @@ public class Content {
         this.versions = versions;
     }
 
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(final String contentType) {
+        this.contentType = contentType;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((contentId == null) ? 0 : contentId.hashCode());
+        result = prime * result + ((contentType == null) ? 0 : contentType.hashCode());
         result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
         result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result + ((properties == null) ? 0 : properties.hashCode());
@@ -102,6 +113,11 @@ public class Content {
             if (other.contentId != null)
                 return false;
         } else if (!contentId.equals(other.contentId))
+            return false;
+        if (contentType == null) {
+            if (other.contentType != null)
+                return false;
+        } else if (!contentType.equals(other.contentType))
             return false;
         if (fileName == null) {
             if (other.fileName != null)
@@ -133,8 +149,8 @@ public class Content {
 
     @Override
     public String toString() {
-        return "Content [contentId=" + contentId + ", fileName=" + fileName + ", path=" + path + ", properties=" + properties + ", subNodes=" + subNodes
-                + ", versions=" + versions + "]";
+        return "Content [contentId=" + contentId + ", fileName=" + fileName + ", path=" + path + ", contentType=" + contentType + ", properties=" + properties
+                + ", subNodes=" + subNodes + ", versions=" + versions + "]";
     }
     
 }

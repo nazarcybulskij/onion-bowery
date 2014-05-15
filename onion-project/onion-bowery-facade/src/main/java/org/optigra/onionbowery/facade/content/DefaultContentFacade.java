@@ -25,11 +25,12 @@ public class DefaultContentFacade implements ContentFacade {
 	}
 
     @Override
-    public ContentResource storeContent(final InputStream stream, final String fileName, final String path, final Map<String, String> attributes) throws ContentException {
+    public ContentResource storeContent(final InputStream stream, final String contentType, final String fileName, final String path, final Map<String, String> attributes) throws ContentException {
         
         // Initialize content object
         Content content = new Content();
         content.setPath(path);
+        content.setContentType(contentType);
         content.setInputStream(stream);
         content.setFileName(fileName);
         content.setProperties(attributes);

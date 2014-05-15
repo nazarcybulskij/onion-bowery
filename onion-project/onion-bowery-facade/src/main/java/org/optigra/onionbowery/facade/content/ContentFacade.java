@@ -10,7 +10,7 @@ public interface ContentFacade {
 
     ContentResource getContentByPath(String contentPath, double version) throws ContentException;
 
-    ContentResource storeContent(InputStream stream, String fileName, String path, Map<String, String> attributes) throws ContentException ;
+    ContentResource storeContent(InputStream stream, String contentType, String fileName, String path, Map<String, String> attributes) throws ContentException ;
 
     void deleteContent(String contentPath) throws ContentException;
 }

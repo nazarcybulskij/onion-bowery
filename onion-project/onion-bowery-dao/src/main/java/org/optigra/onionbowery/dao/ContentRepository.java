@@ -1,14 +1,13 @@
 package org.optigra.onionbowery.dao;
 
-import org.optigra.onionbowery.common.exception.ContentException;
 import org.optigra.onionbowery.model.Content;
 
 public interface ContentRepository {
     
-	Content storeContent(Content content) throws ContentException;
+	Content storeContent(Content content);
 	
-	Content getContentByPath(String id, double version) throws ContentException;
+	Content getContentByPath(String id, double version);
 
-    void deleteContent(String contentPath) throws ContentException;
+    void deleteContent(String contentPath);
 	
 }

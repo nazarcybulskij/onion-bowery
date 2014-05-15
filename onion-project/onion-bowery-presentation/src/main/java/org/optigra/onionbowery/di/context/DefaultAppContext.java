@@ -21,9 +21,9 @@ import org.optigra.onionbowery.di.context.tracks.DaoContext;
 import org.optigra.onionbowery.di.context.tracks.FacadeContext;
 import org.optigra.onionbowery.di.context.tracks.ServiceContext;
 import org.optigra.onionbowery.facade.content.ContentFacade;
+import org.optigra.onionbowery.handler.DefaultRequestHandler;
 import org.optigra.onionbowery.servlet.data.DataConverter;
 import org.optigra.onionbowery.servlet.data.DefaultDataConverter;
-import org.optigra.onionbowery.servlet.request.dispatcher.DefaultRequestHandler;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -68,6 +68,7 @@ public class DefaultAppContext extends AbstractAppContext {
 
     @Override
     public void dependencies() {
+    	put("dataConverter", dataConverter());
         put("servletFileUpload", servletFileUpload());
 
         put("contentDeleteController", contentDeleteController());
@@ -75,7 +76,6 @@ public class DefaultAppContext extends AbstractAppContext {
         put("contentGetController", contentGetController());
         
         put("controllersMap", controllersMap());
-        put("dataConverter", dataConverter());
 
         put("requestHandler", requestHandler());
     }
@@ -135,12 +135,13 @@ public class DefaultAppContext extends AbstractAppContext {
 
     private Bean<Controller> contentGetController() {
 
-        ContentGetController contentController = new ContentGetController();
-        contentController.setContentFacade(getBean("contentFacade", ContentFacade.class));
-
+        ContentGetController instance = new ContentGetController();
+        instance.setContentFacade(getBean("contentFacade", ContentFacade.class));
+        instance.setDataConverter(getBean("dataConverter", DataConverter.class));
+        
         Bean<Controller> contentControllerBean = new Bean<>();
         contentControllerBean.setClz(Controller.class);
-        contentControllerBean.setInstance(contentController);
+        contentControllerBean.setInstance(instance);
         contentControllerBean.setScope(Scope.SINGLETON);
 
         return contentControllerBean;
@@ -148,13 +149,14 @@ public class DefaultAppContext extends AbstractAppContext {
     
     private Bean<Controller> contentPostController() {
         
-        ContentPostController contentController = new ContentPostController();
-        contentController.setContentFacade(getBean("contentFacade", ContentFacade.class));
-        contentController.setServletFileUpload(getBean("servletFileUpload", ServletFileUpload.class));
+        ContentPostController instance = new ContentPostController();
+        instance.setDataConverter(getBean("dataConverter", DataConverter.class));
+        instance.setContentFacade(getBean("contentFacade", ContentFacade.class));
+        instance.setServletFileUpload(getBean("servletFileUpload", ServletFileUpload.class));
         
         Bean<Controller> contentControllerBean = new Bean<>();
         contentControllerBean.setClz(Controller.class);
-        contentControllerBean.setInstance(contentController);
+        contentControllerBean.setInstance(instance);
         contentControllerBean.setScope(Scope.SINGLETON);
         
         return contentControllerBean;
@@ -164,6 +166,7 @@ public class DefaultAppContext extends AbstractAppContext {
 
         ContentDeleteController instance = new ContentDeleteController();
         instance.setContentFacade(getBean("contentFacade", ContentFacade.class));
+        instance.setDataConverter(getBean("dataConverter", DataConverter.class));
         
         Bean<Controller> deleteControllerBean = new Bean<>();
         deleteControllerBean.setClz(Controller.class);

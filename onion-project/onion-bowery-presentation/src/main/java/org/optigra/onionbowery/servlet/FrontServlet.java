@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.optigra.onionbowery.di.context.AppContext;
 import org.optigra.onionbowery.di.context.DefaultAppContext;
+import org.optigra.onionbowery.handler.RequestHandler;
 import org.optigra.onionbowery.servlet.request.RequestWrapper;
-import org.optigra.onionbowery.servlet.request.dispatcher.RequestHandler;
 import org.optigra.onionbowery.servlet.response.ResponseWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class FrontServlet extends HttpServlet {
             appContext = new DefaultAppContext(getServletContext());
             requestHandler = appContext.getBean("requestHandler", RequestHandler.class);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+        	logger.warn("Exception occured while deploying app", e);
         }
     }
 

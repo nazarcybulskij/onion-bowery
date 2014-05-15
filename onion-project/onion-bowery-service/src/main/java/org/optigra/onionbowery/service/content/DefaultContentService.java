@@ -1,6 +1,5 @@
 package org.optigra.onionbowery.service.content;
 
-import org.optigra.onionbowery.common.exception.ContentException;
 import org.optigra.onionbowery.dao.ContentRepository;
 import org.optigra.onionbowery.model.Content;
 
@@ -9,17 +8,17 @@ public class DefaultContentService implements ContentService {
 	private ContentRepository contentRepository;
 
 	@Override
-	public Content getContentByPath(final String path, final double version) throws ContentException {
+	public Content getContentByPath(final String path, final double version) {
 	    return contentRepository.getContentByPath(path, version);
 	}
 
 	@Override
-	public Content storeContent(final Content content) throws ContentException {
+	public Content storeContent(final Content content) {
 		return contentRepository.storeContent(content);
 	}
 
 	@Override
-	public void deleteContent(final String contentPath) throws ContentException {
+	public void deleteContent(final String contentPath) {
 	    contentRepository.deleteContent(contentPath);
 	}
 
