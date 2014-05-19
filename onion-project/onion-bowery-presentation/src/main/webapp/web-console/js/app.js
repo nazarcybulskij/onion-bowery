@@ -37,10 +37,7 @@ define([
 	   
 	   $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 		    if ( !options.beforeSend) {
-		        options.beforeSend = function (xhr) { 
-		        	 var base = security.getAuthCookie();
-		        	 xhr.setRequestHeader('Authorization', base);
-		        };
+		    	
 		    }
 		});
   }

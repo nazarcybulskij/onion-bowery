@@ -2,10 +2,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'jsTree',
   
   'text!templates/content/content-multiple-view.html'
-], function($, _, Backbone, jstree, homeView){ 
+], function($, _, Backbone, homeView){ 
   var HomeView = Backbone.View.extend({
     el: $("body"),
 
@@ -17,20 +16,6 @@ define([
         
         this.$el.children().remove();
         this.$el.append(compiledTemplate);
-        
-        $(document).ready(function(){
-			$("#jstreeselector").jstree({
-					"json_data" : {
-						"data" : [ {
-							"data" : "Search engines"
-						}, {
-							"data" : "Networking sites"
-						} ]
-					},
-					"plugins" : []
-			});
-            
-        });
     }
   });
   

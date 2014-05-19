@@ -37,9 +37,33 @@
       </nav>
 
 	<div id="page-wrapper">
-		<div id="jstreeselector">
-
+		<div id="selector">
+		  <ul>
+		    <li><a>Team A's Projects</a>
+		      <ul>
+		    <li><a>Iteration 1</a>
+		          <ul>
+		            <li><a>Story A</a></li>
+		            <li><a>Story B</a></li>
+		            <li><a>Story C</a></li>
+		          </ul>
+		        </li>
+		    <li><a>Iteration 2</a>
+		          <ul>
+		        <li><a>Story D</a></li>
+		          </ul>
+		        </li>
+		      </ul>
+		    </li>
+		  </ul>
 		</div>
 	</div>
 
 </div>
+<script src="js/libs/jquery/jquery-min.js" ></script>
+<script src="js/libs/jstree/jstree.js" ></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#selector").jstree();
+	});
+</script>
