@@ -33,6 +33,8 @@ public class DefaultContentRepository implements ContentRepository {
 
     private static final String FOLDER = "folder";
     private static final String EMPTY_STRING = "";
+    private static final String ROOT = "/";
+    
     private static final String JCR_PREFIX = "jcr:";
     private static final String FILE = "file";
     private static final String CONTENT_TYPE = "contentType";
@@ -143,10 +145,15 @@ public class DefaultContentRepository implements ContentRepository {
         
         try {
             session = sessionFactory.getCurrentSession();
-            VersionHistory history = session.getWorkspace().getVersionManager().getVersionHistory(path);
             Node basicNode = session.getNode(path);
             
+            VersionHistory history = null;
+            
+            if(!ROOT.equals(path)) {
+            	history = session.getWorkspace().getVersionManager().getVersionHistory(path);
+            }
             Deque<String> versions = getVersions(history);
+            
             Node node  = getRequiredNode(path, versionNumber, session, versions);
             
             nodeContent = contentMapper.map(node);
@@ -166,7 +173,12 @@ public class DefaultContentRepository implements ContentRepository {
 
     private Node getRequiredNode(final String path, final double versionNumber, final Session session, final Deque<String> versions) throws Exception {
         
-        VersionHistory history = session.getWorkspace().getVersionManager().getVersionHistory(path);
+    	VersionHistory history = null;
+    	
+    	if(!ROOT.equals(path)){
+    		history = session.getWorkspace().getVersionManager().getVersionHistory(path);
+    	}
+    	
         Node node;
         
         if(versions.size() == 0) {
@@ -182,6 +194,10 @@ public class DefaultContentRepository implements ContentRepository {
     
     private Deque<String> getVersions(final VersionHistory history) throws Exception {
         LinkedList<String> versions = new LinkedList<>();
+        
+        if(history == null) {
+        	return versions;
+        }
         
         for (VersionIterator it = history.getAllVersions(); it.hasNext();) {
             Version version = (Version) it.next();
