@@ -128,13 +128,13 @@
 											for (opnum in subNodes) {
 												var op = subNodes[opnum]
 												
-												var state = isFile(op) ? 'opened' : 'closed' ;
+												var state = isFile(op.fileName) ? 'opened' : 'closed' ;
 												
-												var path = ops.path === '/' ? ops.path + op : ops.path + '/' + op;
+												var path = ops.path === '/' ? ops.path + op.fileName : ops.path + '/' + op.fileName;
 												
 												var node = {
-													"data" : op,
-													"metadata" : op,
+													"data" : op.fileName,
+													"metadata" : op.fileName,
 													"state" : state,
 													"attr": {
 														path: path

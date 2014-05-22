@@ -24,31 +24,16 @@ public class FacadeContext extends AbstractAppContext {
     }
     
     private Bean<Converter> contentConverter() {
-
         ContentConverterImpl contentConverter = new ContentConverterImpl();
-        
-        Bean<Converter> contentFacadeBean = new Bean<>();
-        
-        contentFacadeBean.setClz(Converter.class);
-        contentFacadeBean.setInstance(contentConverter);
-        contentFacadeBean.setScope(Scope.SINGLETON);
-        
-        return contentFacadeBean;
+        return new Bean<Converter>(contentConverter, Converter.class, Scope.SINGLETON);
     }
 
     private Bean<ContentFacade> contentFacade() {
-
         DefaultContentFacade contentFacade = new DefaultContentFacade();
         contentFacade.setContentConverter(getBeanWrapper("contentConverter", Converter.class).getInstance());
         contentFacade.setContentService(getBeanWrapper("contentService", ContentService.class).getInstance());
         
-        Bean<ContentFacade> contentFacadeBean = new Bean<>();
-        contentFacadeBean = new Bean<>();
-        contentFacadeBean.setClz(ContentFacade.class);
-        contentFacadeBean.setInstance(contentFacade);
-        contentFacadeBean.setScope(Scope.SINGLETON);
-        
-        return contentFacadeBean;
+        return new Bean<ContentFacade>(contentFacade, ContentFacade.class, Scope.SINGLETON);
     }
 
 

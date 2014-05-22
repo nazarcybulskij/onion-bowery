@@ -37,11 +37,7 @@ public class DefaultContentMapper implements ContentMapper<Content> {
             }
         }
         
-        List<String> subNodes = new ArrayList<>();
-        for(NodeIterator iterator = node.getNodes(); iterator.hasNext();) {
-            Node nextNode = iterator.nextNode();
-            subNodes.add(nextNode.getName());
-        }
+        List<Content> subNodes = getSubNodes(node);
         
         // Need to check, in case, when node is only a "folder" and contains no files.
         if(node.hasProperty(FILE)) {
@@ -59,5 +55,16 @@ public class DefaultContentMapper implements ContentMapper<Content> {
         
         return content;
     }
+
+	private List<Content> getSubNodes(final Node node) throws Exception {
+		List<Content> subNodesContent = new ArrayList<>();
+		
+        for(NodeIterator iterator = node.getNodes(); iterator.hasNext();) {
+            Node nextNode = iterator.nextNode();
+            subNodesContent.add(map(nextNode));
+        }
+        
+		return subNodesContent;
+	}
 
 }

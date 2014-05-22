@@ -19,7 +19,18 @@ public class Bean<T> {
         return instance;
     }
 
-    public void setInstance(final T instance) {
+    public Bean() {
+		super();
+	}
+
+	public Bean(T instance, Class<T> clz, Scope scope) {
+		super();
+		this.instance = instance;
+		this.clz = clz;
+		this.scope = scope;
+	}
+
+	public void setInstance(final T instance) {
         this.instance = instance;
     }
 

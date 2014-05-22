@@ -35,8 +35,6 @@ import com.google.gson.GsonBuilder;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class DefaultAppContext extends AbstractAppContext {
-
-    // upload settings
     private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 3;  // 3MB
     private static final int MAX_FILE_SIZE      = 1024 * 1024 * 40; // 40MB
     private static final int MAX_REQUEST_SIZE   = 1024 * 1024 * 50; // 50MB
@@ -81,103 +79,58 @@ public class DefaultAppContext extends AbstractAppContext {
     }
     
     private Bean<ServletContext> servletContext(final ServletContext servletContext) {
-        
-        Bean<ServletContext> servletContextBean = new Bean<>();
-        servletContextBean.setInstance(servletContext);
-        servletContextBean.setClz(ServletContext.class);
-        servletContextBean.setScope(Scope.SINGLETON);
-        
-        return servletContextBean;
+        return new Bean<ServletContext>(servletContext, ServletContext.class, Scope.SINGLETON);
     }
 
     private Bean<DataConverter> dataConverter() {
-        
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         DefaultDataConverter instance = new DefaultDataConverter();
         instance.setGson(gson);
 
-        Bean<DataConverter> dataConverterBean = new Bean<>();
-        dataConverterBean.setClz(DataConverter.class);
-        dataConverterBean.setInstance(instance);
-        dataConverterBean.setScope(Scope.SINGLETON);
-        
-        return dataConverterBean;
+        return new Bean<DataConverter>(instance, DataConverter.class, Scope.SINGLETON);
     }
     
     private Bean<DefaultRequestHandler> requestHandler() {
-
         DefaultRequestHandler instance = new DefaultRequestHandler();
         instance.setControllers(getBean("controllersMap", Map.class));
         instance.setDataConverter(getBean("dataConverter", DataConverter.class));
         
-        Bean<DefaultRequestHandler> requestHandlerBean = new Bean<>();
-        
-        requestHandlerBean = new Bean<DefaultRequestHandler>();
-        requestHandlerBean.setClz(DefaultRequestHandler.class);
-        requestHandlerBean.setInstance(instance);
-        requestHandlerBean.setScope(Scope.SINGLETON);
-
-        return requestHandlerBean;
+        return new Bean<DefaultRequestHandler>(instance, DefaultRequestHandler.class, Scope.SINGLETON);
     }
 
     private Bean<Map> controllersMap() {
+        Map<String, Controller> instance = new HashMap<String, Controller>();
+        urlMapping(instance);
         
-        Map<String, Controller> controllersMap = new HashMap<String, Controller>();
-        urlMapping(controllersMap);
-        
-        Bean<Map> controllersMapBean = new Bean<Map>();
-        controllersMapBean.setClz(Map.class);
-        controllersMapBean.setInstance(controllersMap);
-        controllersMapBean.setScope(Scope.SINGLETON);
-
-        return controllersMapBean;
+        return new Bean<Map>(instance, Map.class, Scope.SINGLETON);
     }
 
     private Bean<Controller> contentGetController() {
-
         ContentGetController instance = new ContentGetController();
         instance.setContentFacade(getBean("contentFacade", ContentFacade.class));
         instance.setDataConverter(getBean("dataConverter", DataConverter.class));
         
-        Bean<Controller> contentControllerBean = new Bean<>();
-        contentControllerBean.setClz(Controller.class);
-        contentControllerBean.setInstance(instance);
-        contentControllerBean.setScope(Scope.SINGLETON);
-
-        return contentControllerBean;
+        return new Bean<Controller>(instance, Controller.class, Scope.SINGLETON);
     }
     
     private Bean<Controller> contentPostController() {
-        
         ContentPostController instance = new ContentPostController();
         instance.setDataConverter(getBean("dataConverter", DataConverter.class));
         instance.setContentFacade(getBean("contentFacade", ContentFacade.class));
         instance.setServletFileUpload(getBean("servletFileUpload", ServletFileUpload.class));
         
-        Bean<Controller> contentControllerBean = new Bean<>();
-        contentControllerBean.setClz(Controller.class);
-        contentControllerBean.setInstance(instance);
-        contentControllerBean.setScope(Scope.SINGLETON);
-        
-        return contentControllerBean;
+        return new Bean<Controller>(instance, Controller.class, Scope.SINGLETON);
     }
     
     private Bean<Controller> contentDeleteController() {
-
         ContentDeleteController instance = new ContentDeleteController();
         instance.setContentFacade(getBean("contentFacade", ContentFacade.class));
         instance.setDataConverter(getBean("dataConverter", DataConverter.class));
         
-        Bean<Controller> deleteControllerBean = new Bean<>();
-        deleteControllerBean.setClz(Controller.class);
-        deleteControllerBean.setInstance(instance);
-        deleteControllerBean.setScope(Scope.SINGLETON);
-        
-        return deleteControllerBean;
+        return new Bean<Controller>(instance, Controller.class, Scope.SINGLETON);
     }
 
     private Bean<ServletFileUpload> servletFileUpload() {
-        
         DiskFileItemFactory factory = new DiskFileItemFactory();
         factory.setSizeThreshold(MEMORY_THRESHOLD);
         factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
@@ -186,12 +139,7 @@ public class DefaultAppContext extends AbstractAppContext {
         upload.setFileSizeMax(MAX_FILE_SIZE);
         upload.setSizeMax(MAX_REQUEST_SIZE);
 
-        Bean<ServletFileUpload> contentControllerBean = new Bean<>();
-        contentControllerBean.setClz(ServletFileUpload.class);
-        contentControllerBean.setInstance(upload);
-        contentControllerBean.setScope(Scope.SINGLETON);
-        
-        return contentControllerBean;
+        return new Bean<ServletFileUpload>(upload, ServletFileUpload.class, Scope.SINGLETON);
     }
 
     private void urlMapping(final Map<String, Controller> controllersMap) {

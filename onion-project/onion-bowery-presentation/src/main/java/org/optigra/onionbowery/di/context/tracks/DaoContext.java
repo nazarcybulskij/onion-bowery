@@ -2,7 +2,6 @@ package org.optigra.onionbowery.di.context.tracks;
 
 import java.io.InputStream;
 
-import javax.jcr.Credentials;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -17,6 +16,8 @@ import org.optigra.onionbowery.dao.DefaultContentRepository;
 import org.optigra.onionbowery.dao.jcr.JcrSessionFactory;
 import org.optigra.onionbowery.dao.jcr.JcrSessionFactoryImpl;
 import org.optigra.onionbowery.dao.mapper.DefaultContentMapper;
+import org.optigra.onionbowery.dao.version.DefaultVersionRetriever;
+import org.optigra.onionbowery.dao.version.VersionRetriever;
 import org.optigra.onionbowery.di.bean.Bean;
 import org.optigra.onionbowery.di.bean.Scope;
 import org.optigra.onionbowery.di.context.AbstractAppContext;
@@ -36,88 +37,60 @@ public class DaoContext extends AbstractAppContext {
         put("jcrSession", jcrSession());
         put("jcrSessionFactory", jcrSessionFactory());
         put("contentMapper", contentMapper());
+        
+        put("versionRetriever", versionRetriever());
+        
         put("contentRepository", contentRepository());
     }
 
-    private Bean<DefaultContentMapper> contentMapper() {
-        
-        DefaultContentMapper contentMapper = new DefaultContentMapper();
-        
-        Bean<DefaultContentMapper> contentMapperBean = new Bean<>();
-        contentMapperBean.setClz(DefaultContentMapper.class);
-        contentMapperBean.setInstance(contentMapper);
-        contentMapperBean.setScope(Scope.SINGLETON);
-        
-        return contentMapperBean;
+	private Bean<DefaultContentMapper> contentMapper() {
+        DefaultContentMapper instance = new DefaultContentMapper();
+        return new Bean<DefaultContentMapper>(instance, DefaultContentMapper.class, Scope.SINGLETON);
     }
+	
+    private Bean<DefaultVersionRetriever> versionRetriever() {
+    	DefaultVersionRetriever instance = new DefaultVersionRetriever();
+    	instance.setContentMapper(getBean("contentMapper", DefaultContentMapper.class));
+    	
+		return new Bean<DefaultVersionRetriever>(instance, DefaultVersionRetriever.class, Scope.SINGLETON);
+	}
 
     private Bean<RepositoryConfig> jcrRepositoryConfig() throws ConfigurationException {
-        
         ServletContext context = getBean("servletContext", ServletContext.class);
         InputStream in =  context.getResourceAsStream("WEB-INF/jcr/jackrabbit-repository.xml");
-        RepositoryConfig repositoryConfig = RepositoryConfig.create(in , "/content");
+        RepositoryConfig instance = RepositoryConfig.create(in , "/content");
         
-        Bean<RepositoryConfig> repositotyConfigBean = new Bean<>();
-        repositotyConfigBean.setClz(RepositoryConfig.class);
-        repositotyConfigBean.setInstance(repositoryConfig);
-        repositotyConfigBean.setScope(Scope.SINGLETON);
-        
-        return repositotyConfigBean;
+        return new Bean<RepositoryConfig>(instance, RepositoryConfig.class, Scope.SINGLETON);
     }
 
 
     private Bean<Repository> jcrRepository() throws RepositoryException {
-
-        RepositoryImpl jcrRepository = RepositoryImpl.create(getBean("jcrRepositoryConfig", RepositoryConfig.class));
+        RepositoryImpl instance = RepositoryImpl.create(getBean("jcrRepositoryConfig", RepositoryConfig.class));
         
-        Bean<Repository> jcrRepositoryBean = new Bean<>();
-        jcrRepositoryBean.setClz(Repository.class);
-        jcrRepositoryBean.setInstance(jcrRepository);
-        jcrRepositoryBean.setScope(Scope.SINGLETON);
-        
-        return jcrRepositoryBean;
+        return new Bean<Repository>(instance, Repository.class, Scope.SINGLETON);
     }
     
     private Bean<Session> jcrSession() throws RepositoryException {
-        
         RepositoryImpl jcrRepository = getBean("jcrRepository", RepositoryImpl.class);
-        Credentials credentials = new SimpleCredentials("user", "pass".toCharArray());
+        Session instance = jcrRepository.login(new SimpleCredentials("user", "pass".toCharArray()));
         
-        Session session = jcrRepository.login(credentials);
-        
-        Bean<Session> sessionBean = new Bean<>();
-        sessionBean.setClz(Session.class);
-        sessionBean.setInstance(session);
-        sessionBean.setScope(Scope.SINGLETON);
-        
-        return sessionBean;
+        return new Bean<Session>(instance, Session.class, Scope.SINGLETON);
     }
 
     private Bean<JcrSessionFactory> jcrSessionFactory() {
+        JcrSessionFactoryImpl instance = new JcrSessionFactoryImpl();
+        instance.setSession(getBean("jcrSession", Session.class));
         
-        JcrSessionFactoryImpl jcrSessionFactory = new JcrSessionFactoryImpl();
-        jcrSessionFactory.setSession(getBean("jcrSession", Session.class));
-        
-        Bean<JcrSessionFactory> jcrSessionFactoryBean = new Bean<>();
-        jcrSessionFactoryBean.setClz(JcrSessionFactory.class);
-        jcrSessionFactoryBean.setInstance(jcrSessionFactory);
-        jcrSessionFactoryBean.setScope(Scope.SINGLETON);
-        
-        return jcrSessionFactoryBean;
+        return new Bean<JcrSessionFactory>(instance, JcrSessionFactory.class, Scope.SINGLETON);
     }
 
     private Bean<ContentRepository> contentRepository() {
+        DefaultContentRepository instance = new DefaultContentRepository();
+        instance.setSessionFactory(getBean("jcrSessionFactory", JcrSessionFactory.class));
+        instance.setContentMapper(getBean("contentMapper", DefaultContentMapper.class));
+        instance.setVersionRetriever(getBean("versionRetriever", VersionRetriever.class));
         
-        DefaultContentRepository contentRepository = new DefaultContentRepository();
-        contentRepository.setSessionFactory(getBean("jcrSessionFactory", JcrSessionFactory.class));
-        contentRepository.setContentMapper(getBean("contentMapper", DefaultContentMapper.class));
-        
-        Bean<ContentRepository> contentRepositoryBean = new Bean<>();
-        contentRepositoryBean.setClz(ContentRepository.class);
-        contentRepositoryBean.setInstance(contentRepository);
-        contentRepositoryBean.setScope(Scope.SINGLETON);
-        
-        return contentRepositoryBean;
+        return new Bean<ContentRepository>(instance, ContentRepository.class, Scope.SINGLETON);
     }
 
 }
