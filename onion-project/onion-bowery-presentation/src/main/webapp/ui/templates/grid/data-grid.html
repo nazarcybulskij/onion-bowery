@@ -1,0 +1,40 @@
+
+<% if(properties.contentType === 'image/jpeg') { %>
+
+<img width="100%" height="100%" src="/onion-bowery-presentation/api/content?contentPath=<%=path%>" >
+
+<% } else { %>
+	<ul id="data-grid">
+<%  
+var rowNum = 5;
+var colNum = subNodes.length;
+var count = 0;
+
+var matrix = [], i, k;
+
+for (i = 0, k = -1; i < subNodes.length; i++) {
+    if (i % rowNum === 0) {
+        k++;
+        matrix[k] = [];
+    }
+
+    matrix[k].push(subNodes[i]);
+}
+
+for(var i = 0; i < matrix.length; i++) {
+    var array = matrix[i];
+    for(var j = 0; j < array.length; j++) { 
+    
+    if(array[j].properties.contentType === 'image/jpeg') { %>
+    	<li data-row="<%= i+1  %>" data-col="<%= j+1 %>" data-sizex="1" data-sizey="1" class="gs-w"><span class="box_no" style="font-size:12px;"><img width="100%" height="100%" src="/onion-bowery-presentation/api/content?contentPath=<%=array[j].path%>" ></li>
+    
+    <% } else { %>
+    	<li data-row="<%= i+1  %>" data-col="<%= j+1 %>" data-sizex="1" data-sizey="1" class="gs-w"><span class="box_no" style="font-size:12px;"><%= array[j].fileName %></span></li>
+    <% }
+    
+ 	 }}
+ 	 
+ 
+%>
+</ul>
+<% } %>
