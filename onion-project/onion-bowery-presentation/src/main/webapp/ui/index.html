@@ -34,7 +34,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#page-top">Onion Bowery</a>
+                <a class="navbar-brand">Onion Bowery</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -45,9 +45,6 @@
                     </li>
                     <li class="page-scroll">
                         <a href="#portfolio">Контент</a>
-                    </li>
-                    <li class="page-scroll">
-                        <a href="#about">Статистика</a>
                     </li>
                 </ul>
             </div>
@@ -129,7 +126,7 @@
 				$(document).ready(function() {
 		 		    gridster = $(".gridster ul").gridster({
 				        widget_margins: [10, 10],
-				        widget_base_dimensions: [200, 200],
+				        widget_base_dimensions: [160, 160],
 			            autogrow_cols: true,
 			            resize: {
 			              enabled: true
@@ -220,6 +217,12 @@
 									"html_titles" : true,
 									"load_open" : true
 								},
+						        themes: {
+						          "theme": "classic",
+						          "dots": true,
+						          "icons": true,
+						          "url": "themes/classic/style.css"
+						        },
 								"plugins" : [ "themes", "json_data", "ui", "crrm", "sort" ]
 							});
 					
